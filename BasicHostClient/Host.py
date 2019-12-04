@@ -3,7 +3,7 @@ import xbee, time
 # set name
 xbee.atcmd("NI","XBee A");
 # configure network
-network_settings = {"CE": 1, "ID": 0xABCD, "EE": 0, "NJ": 0xFF}
+network_settings = {"CE": 1, "ID": 0xABCD, "EE": 0, "NJ": 0xFF, "NT": 0x20}
 for command, value in network_settings.items():
 	print("SET {}: {}".format(command, value))
 	xbee.atcmd(command, value)
