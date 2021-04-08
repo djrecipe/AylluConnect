@@ -1,5 +1,7 @@
 # imports
 import xbee, time
+import micropython
+from sys import stdin, stdout
 # set name
 xbee.atcmd("NI","XBee A");
 # configure network
@@ -20,6 +22,14 @@ print("Operating network parameters:")
 for cmd in operating_network:
 	print("{}: {}".format(cmd, xbee.atcmd(cmd)))
 while 1:
-    print("Sending broadcast")
-    xbee.transmit(xbee.ADDR_BROADCAST, "Hello World!")
-    time.sleep(1)
+    text = ""
+    ch = ''
+    while(True):
+        ch = stdin.buffer.read(1)
+        if(ch == b'\r' or ch == b'\n'):
+            break
+        stdout.buffer.write(ch)
+        text += ch.decode("utf-8")
+    print("")
+    print("Sending: '{}'".format(text))
+    xbee.transmit(xbee.ADDR_BROADCAST, text)

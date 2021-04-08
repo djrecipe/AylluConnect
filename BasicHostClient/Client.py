@@ -1,5 +1,8 @@
 # imports
 import xbee, time
+def rx_callback(packet):
+    if(packet != None):
+        print("{}".format(packet["payload"].decode("utf-8")))
 # set name
 xbee.atcmd("NI","XBee B");
 # configure network
@@ -20,9 +23,9 @@ operating_network = ["OI", "OP", "CH"]
 print("Operating network parameters:")
 for cmd in operating_network:
 	print("{}: {}".format(cmd, xbee.atcmd(cmd)))
+xbee.receive_callback(rx_callback)
 # loops
 while True:
     time.sleep(0.1)
-    vals = xbee.receive()
-    if(vals != None):
-        print("{}".format(vals["payload"]))
+    #vals = xbee.receive()
+    #rx_callback(vals)
