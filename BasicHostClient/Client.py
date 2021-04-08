@@ -12,24 +12,17 @@ time.sleep(1)
 # wait for success
 print("Connecting to network, please wait...")
 while xbee.atcmd("AI") != 0:
-	time.sleep(0.1)
+    time.sleep(0.1)
 print("Connected to Network")
+xbee.receive_callback(None)
 # print network parameters
 operating_network = ["OI", "OP", "CH"]
 print("Operating network parameters:")
 for cmd in operating_network:
 	print("{}: {}".format(cmd, xbee.atcmd(cmd)))
-# print network devices
-while 1:
-    result = xbee.discover()
-    nodes = list(result)
-    if nodes:
-        for node in nodes:
-            name = node["node_id"]
-            strength = node["rssi"]
-            print("'{}: {}'".format(name, strength))
-            if strength>=-14:
-                xbee.atcmd("D4",4);
-            else:
-                xbee.atcmd("D4",5);
-            time.sleep(0.1)
+# loops
+while True:
+    time.sleep(0.1)
+    vals = xbee.receive()
+    if(vals != None):
+        print("{}".format(vals["payload"]))

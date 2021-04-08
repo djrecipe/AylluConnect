@@ -19,3 +19,7 @@ operating_network = ["OI", "OP", "CH"]
 print("Operating network parameters:")
 for cmd in operating_network:
 	print("{}: {}".format(cmd, xbee.atcmd(cmd)))
+while 1:
+    print("Sending broadcast")
+    xbee.transmit(xbee.ADDR_BROADCAST, "Hello World!")
+    time.sleep(1)
