@@ -33,5 +33,23 @@ namespace AbaciConnect.RelayTests
                 relay.SendString(text);
             }
         }
+        [TestMethod]
+        public void SendTextFile()
+        {
+            using (SerialRelay relay = new SerialRelay("COM4"))
+            {
+                string path = "SimpleText.txt";
+                relay.SendFile(path);
+            }
+        }
+        [TestMethod]
+        public void SendBitmapFile()
+        {
+            using (SerialRelay relay = new SerialRelay("COM4"))
+            {
+                string path = "SimpleImage.bmp";
+                relay.SendFile(path);
+            }
+        }
     }
 }

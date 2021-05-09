@@ -31,17 +31,32 @@ namespace AbaciConnect.RelayTests
             Assert.AreEqual(expected_text, result_text);
         }
         [TestMethod]
-        public void TransmitBitmap()
+        public void TransmitTextFile()
+        {
+            using (SerialRelay sender = new SerialRelay("COM4"))
+            {
+                using (SerialRelay receiver = new SerialRelay("COM6"))
+                {
+                    sender.SendFile("SimpleText.txt");
+                    System.Threading.Thread.Sleep(9000);
+                    string result = receiver.GetText();
+                    byte[] bytes = Encoding.UTF8.GetBytes(result);
+                    File.WriteAllBytes("SimpleText_Out.txt", bytes);
+                }
+            }
+        }
+        [TestMethod]
+        public void TransmitBitmapFile()
         {
             using (SerialRelay sender = new SerialRelay("COM4"))
             {
                 using (SerialRelay receiver = new SerialRelay("COM6"))
                 {
                     sender.SendFile("SimpleImage.bmp");
-                    System.Threading.Thread.Sleep(3000);
+                    System.Threading.Thread.Sleep(9000);
                     string result = receiver.GetText();
                     byte[] bytes = Encoding.UTF8.GetBytes(result);
-                    File.WriteAllBytes("ImageOut.bmp", bytes);
+                    File.WriteAllBytes("SimpleImage_Out.bmp", bytes);
                 }
             }
         }

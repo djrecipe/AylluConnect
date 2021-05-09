@@ -23,7 +23,6 @@ print("Operating network parameters:")
 for cmd in operating_network:
     print("{}: {}".format(cmd, xbee.atcmd(cmd)))
 # main loop
-#micropython.kbd_intr(-1)
 data_pending = False
 data_length = 0
 while(True):
@@ -32,20 +31,27 @@ while(True):
     header_marker2=0
     data_type=0
     if(data_pending):
-        data = stdin.buffer.read(data_length)
-        xbee.transmit(xbee.ADDR_BROADCAST, data) # convert bytearray to bytes
+        for x in range(0, data_length, 84):
+            current_length = min(84, data_length - x)
+            data = stdin.buffer.read(current_length)
+            try:
+                xbee.transmit(xbee.ADDR_BROADCAST, data) # convert bytearray to bytes
+            except:
+                xbee.transmit(xbee.ADDR_BROADCAST, "Error while transmitting data")
         data_pending = False
+        micropython.kbd_intr(3)
         data_length = 0
     else:
-        #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for header")
+        #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for header")                                                   # --- DEBUG
         header_data = stdin.buffer.read(11) # blocks until receiving 10 bytes
-        #xbee.transmit(xbee.ADDR_BROADCAST, "Received header " + str(header_data))
+        #xbee.transmit(xbee.ADDR_BROADCAST, "Received header " + str(header_data))                                  # --- DEBUG
         header_marker1, header_marker2, data_type, data_length = unpack('<bbbQ', header_data)
-        #xbee.transmit(xbee.ADDR_BROADCAST, "Header markers: " + str(header_marker1) + ", " + str(header_marker2))
-        #xbee.transmit(xbee.ADDR_BROADCAST, "Header data length: " + str(data_length))
+        #xbee.transmit(xbee.ADDR_BROADCAST, "Header markers: " + str(header_marker1) + ", " + str(header_marker2))  # --- DEBUG
+        #xbee.transmit(xbee.ADDR_BROADCAST, "Header data length: " + str(data_length))                              # --- DEBUG
         if(header_marker1 == 14 and header_marker2==55):
             data_pending=True
-            #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for bytes") # convert bytearray to bytes
+            micropython.kbd_intr(-1)
+            #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for bytes") # convert bytearray to bytes                   # --- DEBUG
         else:
             stdin.buffer.read(-1)
-            #xbee.transmit(xbee.ADDR_BROADCAST, "Invalid data received") # convert bytearray to bytes
+            #xbee.transmit(xbee.ADDR_BROADCAST, "Invalid data received") # convert bytearray to bytes               # --- DEBUG
