@@ -35,7 +35,7 @@ while(True):
             current_length = min(84, data_length - x)
             data = stdin.buffer.read(current_length)
             try:
-                xbee.transmit(xbee.ADDR_BROADCAST, data) # convert bytearray to bytes
+                xbee.transmit(xbee.ADDR_BROADCAST, data)
             except:
                 xbee.transmit(xbee.ADDR_BROADCAST, "Error while transmitting data")
         data_pending = False

@@ -55,7 +55,7 @@ namespace AbaciConnect.RelayTests
                     sender.SendFile("SimpleImage.bmp");
                     System.Threading.Thread.Sleep(9000);
                     string result = receiver.GetText();
-                    byte[] bytes = Encoding.UTF8.GetBytes(result);
+                    byte[] bytes = Encoding.Unicode.GetBytes(result);
                     File.WriteAllBytes("SimpleImage_Out.bmp", bytes);
                 }
             }

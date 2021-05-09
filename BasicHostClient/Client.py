@@ -3,7 +3,10 @@ import xbee, time
 from sys import stdin, stdout
 def rx_callback(packet):
     if(packet != None):
-        stdout.buffer.write(packet["payload"]);
+        stdout.buffer.write(packet["payload"])
+        #for i in range(0,3):
+        #    print("{}".format(packet["payload"][i]))
+        #stdout.buffer.write(data.encode("utf-8"));
         #print("{}".format(packet["payload"]))
 # set name
 xbee.atcmd("NI","XBee B");

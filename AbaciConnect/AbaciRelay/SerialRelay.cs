@@ -17,6 +17,7 @@ namespace AbaciConnect.Relay
             port.Parity = Parity.None;
             port.StopBits = StopBits.One;
             port.Handshake = Handshake.None;
+            port.Encoding = Encoding.Unicode;
             //port.DataReceived += SerialPort_DataReceived;
             //port.ErrorReceived += SerialPort_ErrorReceived;
             port.Open();
