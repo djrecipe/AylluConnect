@@ -8,9 +8,8 @@ namespace AbaciConnect.Relay
 {
     interface IRelay : IDisposable
     {
-        public void Send(byte[] data)
-        {
-
-        }
+        public void SendBytes(byte[] data);
+        public void SendFile(string path);
+        public void SendString(string text);
     }
 }

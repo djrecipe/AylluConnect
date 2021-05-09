@@ -4,7 +4,8 @@ using System.Text;
 namespace AbaciConnect.RelayTests
 {
     [TestClass]
-    public class SerialRelayTests
+    [DeploymentItem("SimpleImage.bmp")]
+    public class OneWaySerialRelayTests
     {
         [TestMethod]
         public void OpenAndClose()
@@ -14,13 +15,22 @@ namespace AbaciConnect.RelayTests
             }
         }
         [TestMethod]
-        public void SendData()
+        public void SendBytes()
         {
             using (SerialRelay relay = new SerialRelay("COM4"))
             {
-                string text = "test";
+                string text = "SerialRelayTests.SendBytes";
                 byte[] data = Encoding.UTF8.GetBytes(text);
-                relay.Send(data);
+                relay.SendBytes(data);
+            }
+        }
+        [TestMethod]
+        public void SendString()
+        {
+            using (SerialRelay relay = new SerialRelay("COM4"))
+            {
+                string text = "SerialRelayTests.SendString";
+                relay.SendString(text);
             }
         }
     }

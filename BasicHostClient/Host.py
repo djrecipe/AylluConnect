@@ -30,6 +30,7 @@ while(True):
     # read header
     header_marker1=0
     header_marker2=0
+    data_type=0
     if(data_pending):
         data = stdin.buffer.read(data_length)
         xbee.transmit(xbee.ADDR_BROADCAST, data) # convert bytearray to bytes
@@ -37,9 +38,9 @@ while(True):
         data_length = 0
     else:
         #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for header")
-        header_data = stdin.buffer.read(10) # blocks until receiving 10 bytes
+        header_data = stdin.buffer.read(11) # blocks until receiving 10 bytes
         #xbee.transmit(xbee.ADDR_BROADCAST, "Received header " + str(header_data))
-        header_marker1, header_marker2, data_length = unpack('<bbQ', header_data)
+        header_marker1, header_marker2, data_type, data_length = unpack('<bbbQ', header_data)
         #xbee.transmit(xbee.ADDR_BROADCAST, "Header markers: " + str(header_marker1) + ", " + str(header_marker2))
         #xbee.transmit(xbee.ADDR_BROADCAST, "Header data length: " + str(data_length))
         if(header_marker1 == 14 and header_marker2==55):

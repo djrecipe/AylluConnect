@@ -1,8 +1,10 @@
 # imports
 import xbee, time
+from sys import stdin, stdout
 def rx_callback(packet):
     if(packet != None):
-        print("{}".format(packet["payload"].decode("utf-8")))
+        stdout.buffer.write(packet["payload"]);
+        #print("{}".format(packet["payload"]))
 # set name
 xbee.atcmd("NI","XBee B");
 # configure network
