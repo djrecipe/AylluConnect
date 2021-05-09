@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct SerialHeader
     {
         public byte Marker1;
         public byte Marker2;
-        public int Length;
+        public long Length;
     }
 }

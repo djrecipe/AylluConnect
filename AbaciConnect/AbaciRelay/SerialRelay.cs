@@ -41,9 +41,9 @@ namespace AbaciConnect.Relay
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.StructureToPtr(header, ptr, true);
             Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
             port.Write(arr, 0, arr.Length);
             port.Write(data, 0, data.Length);
-            Marshal.FreeHGlobal(ptr);
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
