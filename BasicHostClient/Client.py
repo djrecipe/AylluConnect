@@ -1,9 +1,12 @@
 # imports
 import xbee, time
+import micropython
 from sys import stdin, stdout
 def rx_callback(packet):
+    micropython.kbd_intr(-1)
     if(packet != None):
         stdout.buffer.write(packet["payload"])
+    micropython.kbd_intr(3)
         #for i in range(0,3):
         #    print("{}".format(packet["payload"][i]))
         #stdout.buffer.write(data.encode("utf-8"));
@@ -31,6 +34,6 @@ for cmd in operating_network:
 xbee.receive_callback(rx_callback)
 # loops
 while True:
-    time.sleep(0.1)
+    time.sleep(0.01)
     #vals = xbee.receive()
     #rx_callback(vals)

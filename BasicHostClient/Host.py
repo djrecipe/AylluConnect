@@ -34,10 +34,17 @@ while(True):
         for x in range(0, data_length, 84):
             current_length = min(84, data_length - x)
             data = stdin.buffer.read(current_length)
-            try:
-                xbee.transmit(xbee.ADDR_BROADCAST, data)
-            except:
-                xbee.transmit(xbee.ADDR_BROADCAST, "Error while transmitting data")
+            attempts=0
+            pending=True
+            while pending and attempts<10:
+                try:
+                    xbee.transmit(0xB4A4, data)
+                    pending=False
+                except Exception as e:
+                    pending=True
+                    attempts = attempts+1
+                    s = str(e)
+                    stdout.buffer.write("Error while transmitting data: "+s+"\n")
         data_pending = False
         micropython.kbd_intr(3)
         data_length = 0
