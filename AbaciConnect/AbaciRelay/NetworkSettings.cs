@@ -13,9 +13,11 @@ namespace AbaciConnect.Relay
     }
     public class NetworkSettings
     {
+        public bool EnableHostVerification { get; set; } = true;
         public bool EnableEncryption { get;set;} = false;
+        public bool EnableJoinVerification { get;set;} = true;
         public byte MaxTransmissionSize { get;set;} = 0xFF;
-        public ulong NetworkID { get; set; } = 0xABCD;
+        public ulong NetworkID { get; set; } = 0xCCCC;
         public byte NodeDiscoveryDelay { get;set;} = 0x20;
         public byte NodeJoinTime { get;set;} = 0xFF;
         public DeviceRoles Role { get;set;} = DeviceRoles.Join;

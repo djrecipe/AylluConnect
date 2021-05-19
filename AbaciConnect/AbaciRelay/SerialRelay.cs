@@ -16,8 +16,6 @@ namespace AbaciConnect.Relay
         private readonly BackgroundWorker workerWrite = new BackgroundWorker();
         private readonly Mutex mutexPort = new Mutex();
         private readonly Mutex mutexBytes = new Mutex();
-        private int bytesWaitingToRead = 0;
-        private int bytesCurrentlyRead = 0;
         private List<byte> bytesRead = new List<byte>();
         public SerialRelay(string name)
         {
@@ -56,28 +54,27 @@ namespace AbaciConnect.Relay
         public List<byte> WaitForBytes(int count)
         {
             this.mutexBytes.WaitOne();
-            this.bytesWaitingToRead = count;
             this.mutexBytes.ReleaseMutex();
             List<byte> local_bytes = new List<byte>();
             bool pending = true;
             while(pending)
             {
                 this.mutexBytes.WaitOne();
-                if(this.bytesCurrentlyRead >= this.bytesWaitingToRead)
+                if(this.bytesRead.Count >= count)
                 {
                     local_bytes = new List<byte>(this.bytesRead);
-                    pending = false;
-                    this.bytesWaitingToRead = 0;
                     this.bytesRead.Clear();
+                    pending = false;
                 }
                 this.mutexBytes.ReleaseMutex();
                 if(pending)
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
             }
             return local_bytes;
         }
         private void Write(byte[] data)
         {
+            while(this.workerWrite.IsBusy);
             this.ClearBuffer();
             this.workerWrite.RunWorkerAsync(data);
             this.workerWrite.RunWorkerCompleted += workerWrite_RunWorkerCompleted;
@@ -96,18 +93,7 @@ namespace AbaciConnect.Relay
             }
             this.mutexPort.ReleaseMutex();
             this.mutexBytes.WaitOne();
-            if (this.bytesWaitingToRead > 0)
-            {
-
-                this.bytesRead.AddRange(local_bytes);
-                this.bytesCurrentlyRead = this.bytesRead.Count;
-                Debug.WriteLine($"{this.port.PortName} received {this.bytesCurrentlyRead} of {this.bytesWaitingToRead} bytes");
-            }
-            else
-            {
-                string text = Encoding.ASCII.GetString(local_bytes.ToArray());
-                Debug.Write(text);
-            }
+            this.bytesRead.AddRange(local_bytes);
             this.mutexBytes.ReleaseMutex();
             return;
         }

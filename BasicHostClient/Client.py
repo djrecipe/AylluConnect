@@ -14,7 +14,7 @@ def rx_callback(packet):
 # set name
 xbee.atcmd("NI","XBee B");
 # configure network
-network_settings = {"CE": 0, "ID": 0xABCD, "EE": 0, "NT":0x20}
+network_settings = {"CE": 0, "ID": 0x0, "EE": 0, "NT":0x20}
 for command, value in network_settings.items():
 	print("SET {}: {}".format(command, value))
 	xbee.atcmd(command, value)

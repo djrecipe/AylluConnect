@@ -8,7 +8,7 @@ namespace AbaciConnect.Relay
 {
     public class FrameBytesFactory
     {
-        public byte[] CreateATCommand(string command, byte[] value, byte frame_id)
+        public byte[] CreateATCommand(string command, byte[] value, byte frame_id, bool queue)
         {
             ushort data_length = (ushort)(4 + value.Length);
             ushort total_length = (ushort)(data_length +4);
@@ -17,7 +17,8 @@ namespace AbaciConnect.Relay
             result[0] = CONSTANTS.START_BYTE;               // start byte
             result[1] = (byte)(data_length >> 8);           // data length MSB
             result[2] = (byte)data_length;                  // data length LSB
-            result[3] = CONSTANTS.FT_ATCMD;                 // frame type
+            result[3] = queue ?
+                CONSTANTS.FT_ATCMDQ : CONSTANTS.FT_ATCMD;   // frame type
             result[4] = frame_id;                           // frame ID
             result[5] = (byte)command[0];                   // AT command char 0
             result[6] = (byte)command[1];                   // AT command char 1

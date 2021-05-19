@@ -10,6 +10,7 @@ namespace AbaciConnect.Relay
     {
         internal static readonly byte START_BYTE = 0x7e;
         internal static readonly byte FT_ATCMD = 0x08;
+        internal static readonly byte FT_ATCMDQ = 0x09;
         internal static readonly byte FT_TRANSMIT = 0x10;
     }
 }
