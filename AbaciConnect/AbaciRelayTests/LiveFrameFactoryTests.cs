@@ -66,7 +66,11 @@ namespace AbaciConnect.RelayTests
         {
             ulong broadcast = 0x000000000000FFFF;
             ulong long_address = 0x0013A20041B764AD;
-            string text = "xxxxx";
+            string text = "";
+            for(int i=0; i<84; i++)
+            {
+                text+="x";
+            } // looks like 84 is the magic number so that the packets dont fragment; should probably start making a transmission/packet/etc class that can hold arrays of these 84 byte transmissions
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             byte[] bytes = factory.SendData(long_address, data_bytes);
             int response_size = 11;
@@ -80,7 +84,7 @@ namespace AbaciConnect.RelayTests
                     response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
                 ushort short_address = (ushort)(((ushort)response.AddressH<<8)|response.AddressL);
                 bytes = factory.SendData(short_address, data_bytes);
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 100; i++)
                 {
                     relay.SendBytes(bytes);
                     response_bytes = relay.WaitForBytes(response_size);
