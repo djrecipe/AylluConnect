@@ -12,6 +12,7 @@ namespace AbaciConnect.RelayTests
     public class OneWaySerialRelayTests
     {
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
+        private readonly StructFactory structFactory = new StructFactory();
         [TestMethod]
         public void OpenAndClose()
         {
@@ -41,7 +42,7 @@ namespace AbaciConnect.RelayTests
             }
         }
         [TestMethod]
-        public void SendEasyData()
+        public void SendSimpleData()
         {
             ulong broadcast = 0x000000000000FFFF;
             ulong address = 0x0013A20041B764AD;
@@ -49,19 +50,46 @@ namespace AbaciConnect.RelayTests
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             byte[] bytes = factory.SendData(address, data_bytes);
             int response_size = 11;
-            TransmissionResponse response = new TransmissionResponse();
             using (SerialRelay relay = new SerialRelay("COM4"))
             {
-                for(int i=0; i<10000; i++)
+                relay.SendBytes(bytes);
+                List<byte> response_bytes = relay.WaitForBytes(response_size);
+                TransmissionResponse response = this.structFactory.Unpack<TransmissionResponse>(
+                    response_bytes.ToArray(), response_size);
+                Console.WriteLine("Frame ID: {0}; Result: {2}",
+                    response.FrameID, response.DeliveryStatus);
+                Assert.AreEqual(0, response.DeliveryStatus);
+            }
+        }
+        [TestMethod]
+        public void SendSimpleDataStream()
+        {
+            ulong broadcast = 0x000000000000FFFF;
+            ulong long_address = 0x0013A20041B764AD;
+            string text = "xxxxx";
+            byte[] data_bytes = Encoding.UTF8.GetBytes(text);
+            byte[] bytes = factory.SendData(long_address, data_bytes);
+            int response_size = 11;
+            using (SerialRelay relay = new SerialRelay("COM4"))
+            {
+                relay.SendBytes(bytes);
+                List<byte> response_bytes = relay.WaitForBytes(response_size);
+                TransmissionResponse response = this.structFactory.Unpack<TransmissionResponse>(
+                    response_bytes.ToArray(), response_size);
+                Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
+                    response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
+                ushort short_address = (ushort)(((ushort)response.AddressH<<8)|response.AddressL);
+                bytes = factory.SendData(short_address, data_bytes);
+                for (int i = 0; i < 1000; i++)
                 {
                     relay.SendBytes(bytes);
-                    List<byte> response_bytes = relay.WaitForBytes(response_size);
-                    IntPtr ptr = Marshal.AllocHGlobal(response_size);
-                    Marshal.Copy(response_bytes.ToArray(), 0, ptr, response_size);
-                    response = (TransmissionResponse)Marshal.PtrToStructure(ptr, typeof(TransmissionResponse));
-                    Marshal.FreeHGlobal(ptr);
-                    Console.WriteLine("Frame ID: {0}; Result: {1}", response.FrameID, response.DeliveryStatus);
-                    System.Threading.Thread.Sleep(10);
+                    response_bytes = relay.WaitForBytes(response_size);
+                    response = this.structFactory.Unpack<TransmissionResponse>(
+                        response_bytes.ToArray(), response_size);
+                    Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
+                        response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
+                    Assert.AreEqual(0, response.DeliveryStatus);
+                    //System.Threading.Thread.Sleep(10);
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace AbaciConnect.Relay
             result[total_length-1] = checksum;               // checksum
             return result;
         }
-        public byte[] CreateTransmission(ulong address, byte[] data, byte frame_id, byte radius, byte options)
+        public byte[] CreateTransmission(ulong laddress, ushort saddress, byte[] data, byte frame_id, byte radius, byte options)
         {
             ushort data_length = (ushort)(14 + data.Length);
             ushort total_length = (ushort)(data_length + 4);
@@ -42,16 +42,16 @@ namespace AbaciConnect.Relay
             result[2] = (byte)data_length;                  // data length LSB
             result[3] = CONSTANTS.FT_TRANSMIT;              // frame type
             result[4] = frame_id;                           // frame ID
-            result[5] = (byte)(address >> 56);              // destination address MSB
-            result[6] = (byte)(address >> 48);              // destination address
-            result[7] = (byte)(address >> 40);              // destination address
-            result[8] = (byte)(address >> 32);              // destination address
-            result[9] = (byte)(address >> 24);              // destination address
-            result[10] = (byte)(address >> 16);             // destination address
-            result[11] = (byte)(address >> 8);              // destination address
-            result[12] = (byte)address;                     // destination address LSB
-            result[13] = 0xFF;                              // 16-bit address MSB (not used)
-            result[14] = 0xFE;                              // 16-bit address LSB (not used)
+            result[5] = (byte)(laddress >> 56);             // destination address MSB
+            result[6] = (byte)(laddress >> 48);             // destination address
+            result[7] = (byte)(laddress >> 40);             // destination address
+            result[8] = (byte)(laddress >> 32);             // destination address
+            result[9] = (byte)(laddress >> 24);             // destination address
+            result[10] = (byte)(laddress >> 16);            // destination address
+            result[11] = (byte)(laddress >> 8);             // destination address
+            result[12] = (byte)laddress;                    // destination address LSB
+            result[13] = (byte)(saddress>>8);               // 16-bit address MSB
+            result[14] = (byte)saddress;                    // 16-bit address LSB
             result[15] = radius;                            // broadcast radius
             result[16] = options;                           // transmission options
             for (int i = 0; i < data.Length; i++)

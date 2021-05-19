@@ -8,6 +8,7 @@ namespace AbaciConnect.Relay
 {
     public class CommandBytesFactory
     {
+        private static byte currentFrameId = 1;
         private readonly FrameBytesFactory bytesFactory = new FrameBytesFactory();
         public byte[] SetName(string name)
         {
@@ -69,7 +70,11 @@ namespace AbaciConnect.Relay
         }
         public byte[] SendData(ulong address, byte[] data)
         {
-            return this.bytesFactory.CreateTransmission(address, data, 1, 0, 0);
+            return this.bytesFactory.CreateTransmission(address, 0xFFFE, data, currentFrameId++, 0, 0);
+        }
+        public byte[] SendData(ushort address, byte[] data)
+        {
+            return this.bytesFactory.CreateTransmission(0xFFFFFFFFFFFFFFFF, address, data, currentFrameId++, 0, 0);
         }
     }
 }

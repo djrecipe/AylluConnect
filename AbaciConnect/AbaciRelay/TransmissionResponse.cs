@@ -11,10 +11,12 @@ namespace AbaciConnect.Relay
     public struct TransmissionResponse
     {
         public byte StartByte;
-        public ushort Length;
+        public byte LengthH;
+        public byte LengthL;
         public byte FrameType;
         public byte FrameID;
-        public ushort Address;
+        public byte AddressH;
+        public byte AddressL;
         public byte RetryCount;
         public byte DeliveryStatus;
         public byte DiscoveryStatus;
