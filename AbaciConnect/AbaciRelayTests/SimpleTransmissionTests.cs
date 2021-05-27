@@ -9,10 +9,11 @@ namespace AbaciConnect.RelayTests
 {
     [TestClass]
     [DeploymentItem("SimpleImage.bmp")]
-    public class OneWaySerialRelayTests
+    public class SimpleTransmissionTests
     {
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
         private readonly StructFactory structFactory = new StructFactory();
+        private readonly EmissionDecoder emissionDecoder = new EmissionDecoder();
         [TestMethod]
         public void OpenAndClose()
         {
@@ -23,7 +24,7 @@ namespace AbaciConnect.RelayTests
         [TestMethod]
         public void SetName()
         {
-            byte[] bytes = factory.SetName("XBee A");
+            byte[] bytes = factory.CreateSetNameFrame("XBee A");
             using (SerialRelay relay = new SerialRelay("COM4"))
             {
                 relay.SendBytes(bytes);
@@ -35,7 +36,7 @@ namespace AbaciConnect.RelayTests
             string port = "COM4";
             NetworkSettings settings = new NetworkSettings();
             settings.Role = DeviceRoles.Create;
-            byte[] bytes = factory.SetNetworkSettings(settings);
+            byte[] bytes = factory.CreateSetNetworkSettingsFrame(settings);
             using (SerialRelay relay = new SerialRelay(port))
             {
                 relay.SendBytes(bytes);
@@ -48,15 +49,18 @@ namespace AbaciConnect.RelayTests
             ulong address = 0x0013A20041B764AD;
             string text = "xxxxx";
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-            byte[] bytes = factory.SendData(address, data_bytes);
-            int response_size = 11;
+            byte[] bytes = factory.CreateSendDataFrame(address, data_bytes);
             using (SerialRelay relay = new SerialRelay("COM4"))
             {
                 relay.SendBytes(bytes);
-                List<byte> response_bytes = relay.WaitForBytes(response_size);
-                TransmissionResponse response = this.structFactory.Unpack<TransmissionResponse>(
-                    response_bytes.ToArray(), response_size);
-                Console.WriteLine("Frame ID: {0}; Result: {2}",
+                List<byte> response_bytes = relay.WaitForBytes(CONSTANTS.EMISSION_HEADER_SIZE);
+                // TODO 5/27/21: move all emission response code to be asynchronous and in response to serial receives, and then fitler through those responses
+                EmissionDescriptor em_desc = this.emissionDecoder.Decode(response_bytes.ToArray());
+                response_bytes = relay.WaitForBytes(em_desc.Length);
+                // 
+                ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
+                    response_bytes.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
+                Console.WriteLine("Frame ID: {0}; Result: {1}",
                     response.FrameID, response.DeliveryStatus);
                 Assert.AreEqual(0, response.DeliveryStatus);
             }
@@ -72,24 +76,31 @@ namespace AbaciConnect.RelayTests
                 text+="x";
             } // looks like 84 is the magic number so that the packets dont fragment; should probably start making a transmission/packet/etc class that can hold arrays of these 84 byte transmissions
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-            byte[] bytes = factory.SendData(long_address, data_bytes);
-            int response_size = 11;
+            byte[] bytes = factory.CreateSendDataFrame(long_address, data_bytes);
             using (SerialRelay relay = new SerialRelay("COM4"))
             {
                 relay.SendBytes(bytes);
-                List<byte> response_bytes = relay.WaitForBytes(response_size);
-                TransmissionResponse response = this.structFactory.Unpack<TransmissionResponse>(
-                    response_bytes.ToArray(), response_size);
+                List<byte> response_bytes = relay.WaitForBytes(CONSTANTS.EMISSION_HEADER_SIZE);
+                // TODO 5/27/21: move all emission response code to be asynchronous and in response to serial receives, and then fitler through those responses
+                EmissionDescriptor em_desc = this.emissionDecoder.Decode(response_bytes.ToArray());
+                response_bytes = relay.WaitForBytes(em_desc.Length);
+                // 
+                ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
+                    response_bytes.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
                 Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
                     response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
                 ushort short_address = (ushort)(((ushort)response.AddressH<<8)|response.AddressL);
-                bytes = factory.SendData(short_address, data_bytes);
+                bytes = factory.CreateSendDataFrame(short_address, data_bytes);
                 for (int i = 0; i < 100; i++)
                 {
                     relay.SendBytes(bytes);
-                    response_bytes = relay.WaitForBytes(response_size);
-                    response = this.structFactory.Unpack<TransmissionResponse>(
-                        response_bytes.ToArray(), response_size);
+                    response_bytes = relay.WaitForBytes(CONSTANTS.EMISSION_HEADER_SIZE);
+                    // TODO 5/27/21: move all emission response code to be asynchronous and in response to serial receives, and then fitler through those responses
+                    em_desc = this.emissionDecoder.Decode(response_bytes.ToArray());
+                    response_bytes = relay.WaitForBytes(em_desc.Length);
+                    // 
+                    response = this.structFactory.Unpack<ExtendedTransmitStatus>(
+                        response_bytes.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
                     Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
                         response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
                     Assert.AreEqual(0, response.DeliveryStatus);

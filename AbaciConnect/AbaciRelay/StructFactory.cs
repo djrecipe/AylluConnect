@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay
 {
-    public class StructFactory
+    internal class StructFactory
     {
-        public T Unpack<T>(byte[] data, int size)
+        internal T Unpack<T>(byte[] data, int size)
         {
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.Copy(data, 0, ptr, size);

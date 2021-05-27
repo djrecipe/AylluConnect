@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay
 {
+    public enum CommandOperations : int
+    {
+        SetName=0,
+        SetNetworkSettings=1,
+        SendDataL=2,
+        SendDataS=3
+    }
     public class CommandBytesFactory
     {
         private static byte currentFrameId = 1;
         private readonly FrameBytesFactory bytesFactory = new FrameBytesFactory();
-        public byte[] SetName(string name)
+        public byte[] CreateSetNameFrame(string name)
         {
             byte[] name_bytes = Encoding.UTF8.GetBytes(name);
             return this.bytesFactory.CreateATCommand("NI", name_bytes, 0, false);
         }
-        public byte[] SetNetworkSettings(NetworkSettings settings)
+        public byte[] CreateSetNetworkSettingsFrame(NetworkSettings settings)
         {
             List<byte> result = new List<byte>();
             byte[] parameter;
@@ -68,11 +75,11 @@ namespace AbaciConnect.Relay
             result.AddRange(buffer);
             return result.ToArray();
         }
-        public byte[] SendData(ulong address, byte[] data)
+        public byte[] CreateSendDataFrame(ulong address, byte[] data)
         {
             return this.bytesFactory.CreateTransmission(address, 0xFFFE, data, currentFrameId++, 0, 0);
         }
-        public byte[] SendData(ushort address, byte[] data)
+        public byte[] CreateSendDataFrame(ushort address, byte[] data)
         {
             return this.bytesFactory.CreateTransmission(0xFFFFFFFFFFFFFFFF, address, data, currentFrameId++, 0, 0);
         }
