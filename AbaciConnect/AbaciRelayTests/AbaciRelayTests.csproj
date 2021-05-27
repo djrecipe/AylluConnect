@@ -4,22 +4,11 @@
     <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
-  </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="..\TestResources\Mustang.jpg" Link="Mustang.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\TestResources\ShinChan.jpg" Link="ShinChan.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\TestResources\SimpleImage.bmp" Link="SimpleImage.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\TestResources\SimpleText.txt" Link="SimpleText.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <AssemblyName>AbaciConnect.RelayTests</AssemblyName>
+
+    <RootNamespace>AbaciConnect.RelayTests</RootNamespace>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />

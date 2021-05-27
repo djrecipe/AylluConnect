@@ -7,18 +7,17 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Linq;
 
 namespace AbaciConnect.Relay
 {
-    public class SerialRelay : IRelay
+    internal class SerialRelay : IRelay
     {
         private readonly SerialPort port = null;
         private readonly BackgroundWorker workerWrite = new BackgroundWorker();
         private readonly Mutex mutexPort = new Mutex();
         private readonly Mutex mutexBytes = new Mutex();
-        private int bytesWaitingToRead = 0;
-        private int bytesCurrentlyRead = 0;
-        private List<byte> bytesRead = new List<byte>();
+        private List<byte> byteQueue = new List<byte>();
         public SerialRelay(string name)
         {
             this.workerWrite.DoWork += this.workerWrite_DoWork;
@@ -49,72 +48,49 @@ namespace AbaciConnect.Relay
             if (this.port.IsOpen)
                 this.port.Close();
         }
-        private byte[] GetHeader(DataTypes type, long length)
+        public void SendBytes(byte[] data)
         {
-            SerialHeader header;
-            header.Marker1 = 14;
-            header.Marker2 = 55;
-            header.Type = DataTypes.Bytes;
-            header.Length = length;
-            int size = Marshal.SizeOf(header);
-            byte[] arr = new byte[size];
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(header, ptr, true);
-            Marshal.Copy(ptr, arr, 0, size);
-            Marshal.FreeHGlobal(ptr);
-            return arr;
-        }
-        public void SendBytes(byte[] data, DataTypes data_type = DataTypes.Bytes)
-        {
-            byte[] header_bytes = GetHeader(data_type, data.Length);
-            Write(data, header_bytes);
-        }
-        public void SendString(string text)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(text);
-            SendBytes(data, DataTypes.String);
-        }
-        public void SendFile(string path)
-        {
-            byte[] data = File.ReadAllBytes(path);
-            SendBytes(data, DataTypes.File);
+            Write(data);
         }
         public List<byte> WaitForBytes(int count)
         {
-            this.mutexBytes.WaitOne();
-            this.bytesWaitingToRead = count;
-            this.mutexBytes.ReleaseMutex();
             List<byte> local_bytes = new List<byte>();
-            bool pending = true;
-            while(pending)
+            // wait for bytes
+            while(true)
             {
                 this.mutexBytes.WaitOne();
-                if(this.bytesCurrentlyRead >= this.bytesWaitingToRead)
+                // check if new bytes received
+                if(this.byteQueue.Count > 0)
                 {
-                    local_bytes = new List<byte>(this.bytesRead);
-                    pending = false;
-                    this.bytesWaitingToRead = 0;
-                    this.bytesRead.Clear();
+                    // determine number of remaining bytes desired
+                    int remaining = count - local_bytes.Count;
+                    // determine number of bytes to take
+                    int take_count = Math.Min(this.byteQueue.Count, remaining);
+                    // copy the bytes
+                    local_bytes.AddRange(this.byteQueue.Take(take_count));
+                    // remove bytes from queue
+                    this.byteQueue.RemoveRange(0, take_count);
                 }
                 this.mutexBytes.ReleaseMutex();
-                if(pending)
-                    Thread.Sleep(100);
+                // check if recieved desired byte count
+                if (local_bytes.Count >= count)
+                    break;
             }
+            // return bytes
             return local_bytes;
         }
-        private void Write(byte[] data, byte[] header)
+        private void Write(byte[] data)
         {
+            while(this.workerWrite.IsBusy);
             this.ClearBuffer();
-            Tuple<byte[], byte[]> args = new Tuple<byte[], byte[]>(data, header);
-            this.workerWrite.RunWorkerAsync(args);
+            this.workerWrite.RunWorkerAsync(data);
             this.workerWrite.RunWorkerCompleted += workerWrite_RunWorkerCompleted;
         }
-
-
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             List<byte> local_bytes = new List<byte>();
             this.mutexPort.WaitOne();
+            // read bytes
             while (this.port.BytesToRead > 0)
             {
                 int current_byte = port.ReadByte();
@@ -122,19 +98,9 @@ namespace AbaciConnect.Relay
                     local_bytes.Add((byte)current_byte);
             }
             this.mutexPort.ReleaseMutex();
+            // add bytes to thread-safe queue
             this.mutexBytes.WaitOne();
-            if (this.bytesWaitingToRead > 0)
-            {
-
-                this.bytesRead.AddRange(local_bytes);
-                this.bytesCurrentlyRead = this.bytesRead.Count;
-                Debug.WriteLine($"{this.port.PortName} received {this.bytesCurrentlyRead} of {this.bytesWaitingToRead} bytes");
-            }
-            else
-            {
-                string text = Encoding.ASCII.GetString(local_bytes.ToArray());
-                Debug.Write(text);
-            }
+            this.byteQueue.AddRange(local_bytes);
             this.mutexBytes.ReleaseMutex();
             return;
         }
@@ -143,26 +109,14 @@ namespace AbaciConnect.Relay
         }
         private void workerWrite_DoWork(object sender, DoWorkEventArgs e)
         {
-            Tuple<byte[],byte[]> args = e.Argument as Tuple<byte[],byte[]>;
-            byte[] data = args.Item1;
-            byte[] header = args.Item2;
+            byte[] args = e.Argument as byte[];
             // send header bytes
             this.mutexPort.WaitOne();
-            port.Write(header, 0, header.Length);
-            for (int i = 0; i < data.Length; i+=84)
-            {
-                int current_length = Math.Min(84, data.Length - i);
-                port.Write(data, i, current_length);
-                // TODO 5/12/21: determine why this sleep is necessary
-                Thread.Sleep(20);
-            }
+            port.Write(args, 0, args.Length);
             this.mutexPort.ReleaseMutex();
-            e.Result = data.Length;
         }
         private void workerWrite_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            int length = (int)e.Result;
-            Debug.WriteLine($"{this.port.PortName} sent {length} bytes");
         }
 
     }
