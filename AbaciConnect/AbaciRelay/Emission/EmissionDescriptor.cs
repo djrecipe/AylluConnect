@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AbaciConnect.Relay.EmissionStructures;
 
-namespace AbaciConnect.Relay
+namespace AbaciConnect.Relay.Emission
 {
     public class EmissionDescriptor
     { 

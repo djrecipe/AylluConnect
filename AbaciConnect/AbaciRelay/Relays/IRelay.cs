@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay
 {
-    interface IRelayController : IDisposable
+    interface IRelay : IDisposable
     {
-        public List<byte> ReceiveBytes();
-        public void SendBytes(ushort address, byte[] data);
+        public void ClearBuffer();
+        public void SendBytes(byte[] data);
     }
 }

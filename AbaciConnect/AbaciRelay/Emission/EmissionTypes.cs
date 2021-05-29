@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbaciConnect.Relay.EmissionStructures
+namespace AbaciConnect.Relay.Emission
 {
     public enum EmissionTypes : byte
     {

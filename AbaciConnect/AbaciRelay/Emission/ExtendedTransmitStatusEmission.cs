@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using AbaciConnect.Relay.Common;
 
-namespace AbaciConnect.Relay.EmissionStructures
+namespace AbaciConnect.Relay.Emission
 {
     public class ExtendedTransmitStatusEmission : IUnpackable
     {

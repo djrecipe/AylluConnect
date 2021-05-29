@@ -4,16 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using AbaciConnect.Relay.EmissionStructures;
+using AbaciConnect.Relay.Common;
+using AbaciConnect.Relay.Emission;
 
-namespace AbaciConnect.Relay
+namespace AbaciConnect.Relay.Processors
 {
-    public class FrameByteReceiver : IByteReceiver
+    public class EmissionProcessor : IEmissionProcessor
     {
         private readonly Mutex mutexEmissions = new Mutex();
+        private readonly Mutex mutexBytes = new Mutex();
         private readonly List<EmissionDescriptor> emissions = new List<EmissionDescriptor>();
         private EmissionHeader currentHeader = new EmissionHeader();
         private List<byte> pendingBytes = new List<byte>();
+        public event EventHandler<EmissionDescriptor> OnEmission;
         public enum ReceiveStates : int
         {
             ReceiveStartByte = 0,
@@ -21,7 +24,20 @@ namespace AbaciConnect.Relay
             ReceiveFrame = 2
         }
         public ReceiveStates ReceiveState { get; private set; } = ReceiveStates.ReceiveStartByte;
-        public byte StartByte => CONSTANTS.START_BYTE;
+        public byte StartByte => CONSTANTS.FRAME_START_BYTE;
+        public void Clear()
+        {
+            this.mutexEmissions.WaitOne();
+            this.emissions.Clear();
+            this.mutexEmissions.ReleaseMutex();
+            this.mutexBytes.WaitOne();
+            this.pendingBytes.Clear();
+            this.mutexBytes.ReleaseMutex();
+        }
+        public List<EmissionDescriptor> GetAllEmissions()
+        {
+            return this.emissions;
+        }
         public void ReceiveBytes(List<byte> bytes)
         {
             this.pendingBytes.AddRange(bytes);
@@ -49,7 +65,7 @@ namespace AbaciConnect.Relay
         {
             // find start byte
             bool success = false;
-            int index = this.pendingBytes.FindIndex(b => b == CONSTANTS.START_BYTE);
+            int index = this.pendingBytes.FindIndex(b => b == CONSTANTS.FRAME_START_BYTE);
             // determine success
             if(index < 0)       // if start byte not found, remove all bytes
                 index = this.pendingBytes.Count;
@@ -71,11 +87,16 @@ namespace AbaciConnect.Relay
                 return false;
             this.ReceiveState = ReceiveStates.ReceiveStartByte;
             // create emission description
+            EmissionDescriptor desc = new EmissionDescriptor(this.currentHeader,
+                this.pendingBytes.Take(required_count).ToList());
             this.mutexEmissions.WaitOne();
-            this.emissions.Add(new EmissionDescriptor(this.currentHeader, this.pendingBytes.Take(required_count).ToList()));
+            this.emissions.Add(desc);
             this.mutexEmissions.ReleaseMutex();
             // remove emission bytes
             this.pendingBytes.RemoveRange(0, required_count);
+            // invoke callback
+            if(this.OnEmission != null)
+                this.OnEmission(this, desc);
             return true;
         }
         public void RemoveEmission(ulong id)
@@ -95,11 +116,14 @@ namespace AbaciConnect.Relay
             this.pendingBytes.RemoveRange(0, required_count);
             return true;
         }
-        public EmissionDescriptor WaitForEmission(EmissionTypes type)
+        public EmissionDescriptor WaitForEmission(EmissionTypes type, int timeout)
         {
             EmissionDescriptor desc = null;
-            while(desc == null)
+            DateTime start = DateTime.Now;
+            while (desc == null)
             {
+                if(DateTime.Now > start + TimeSpan.FromMilliseconds(timeout))
+                    throw new TimeoutException("Timeout while waiting for emission");
                 this.mutexEmissions.WaitOne();
                 int index = this.emissions.FindIndex(em => em.Header.FrameType == type);
                 if(index > -1)
@@ -108,7 +132,6 @@ namespace AbaciConnect.Relay
                     this.emissions.RemoveAt(index);
                 }
                 this.mutexEmissions.ReleaseMutex();
-                //Thread.Sleep(10);
             }
             return desc;
         }

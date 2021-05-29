@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 
 [assembly: InternalsVisibleTo("AbaciConnect.RelayTests")]
-namespace AbaciConnect.Relay
+namespace AbaciConnect.Relay.Common
 {
     internal class CONSTANTS
     {
+        internal const int MAX_FRAME_DATA = 84;
         internal const int EMISSION_HEADER_SIZE = 4;
         internal const int PACKET_TYPE_OFFSET = 3;
-        internal const byte START_BYTE = 0x7e;
+        internal const byte FRAME_START_BYTE = 0x7e;
+        internal const byte XM_HEADER_START_BYTE = 0xDD;
+        internal const byte XM_PACKET_HEADER_START_BYTE = 0xBC;
         internal const byte FT_ATCMD = 0x08;
         internal const byte FT_ATCMDQ = 0x09;
         internal const byte FT_TRANSMIT = 0x10;

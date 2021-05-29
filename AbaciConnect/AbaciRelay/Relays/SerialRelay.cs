@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Linq;
 
+using AbaciConnect.Relay.Processors;
+
 namespace AbaciConnect.Relay
 {
     internal class SerialRelay : IRelay
@@ -16,8 +18,8 @@ namespace AbaciConnect.Relay
         private readonly SerialPort port = null;
         private readonly BackgroundWorker workerWrite = new BackgroundWorker();
         private readonly Mutex mutexPort = new Mutex();
-        private readonly IByteReceiver receiver;
-        public SerialRelay(string name, IByteReceiver receiver_in)
+        private readonly IEmissionProcessor receiver;
+        public SerialRelay(string name, IEmissionProcessor receiver_in)
         {
             //
             this.receiver = receiver_in;
@@ -33,6 +35,8 @@ namespace AbaciConnect.Relay
             port.Encoding = Encoding.Unicode;
             port.DataReceived += SerialPort_DataReceived;
             port.ErrorReceived += SerialPort_ErrorReceived;
+            port.ReadBufferSize = 100000;
+            port.WriteBufferSize = 100000;
             port.Open();
             port.DiscardInBuffer();
             if(!port.IsOpen)
@@ -72,7 +76,7 @@ namespace AbaciConnect.Relay
                 if(current_byte != -1)
                 { 
                     local_bytes.Add((byte)current_byte);
-                    Console.WriteLine($"Port {this.port.PortName} received {current_byte:X2}");
+                    //Console.WriteLine($"Port {this.port.PortName} received {current_byte:X2}");
                 }
             }
             this.mutexPort.ReleaseMutex();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AbaciConnect.Relay.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace AbaciConnect.Relay
             ushort total_length = (ushort)(data_length +4);
             byte[] result = new byte[total_length];
             //
-            result[0] = CONSTANTS.START_BYTE;               // start byte
+            result[0] = CONSTANTS.FRAME_START_BYTE;               // start byte
             result[1] = (byte)(data_length >> 8);           // data length MSB
             result[2] = (byte)data_length;                  // data length LSB
             result[3] = queue ?
@@ -24,10 +25,7 @@ namespace AbaciConnect.Relay
             result[6] = (byte)command[1];                   // AT command char 1
             for(int i=0; i< value.Length; i++)
                 result[i+7]=value[i];                       // data
-            byte byte_sum = 0;
-            for(int i=0; i<data_length; i++)
-                byte_sum+=result[3+i];
-            byte checksum = (byte)(0xFF-byte_sum);
+            byte checksum = Checksum.Calculate(result.Skip(3).Take(total_length-3-1)); // skip first 3 bytes and last byte
             result[total_length-1] = checksum;               // checksum
             return result;
         }
@@ -37,7 +35,7 @@ namespace AbaciConnect.Relay
             ushort total_length = (ushort)(data_length + 4);
             byte[] result = new byte[total_length];
             //
-            result[0] = CONSTANTS.START_BYTE;               // start byte
+            result[0] = CONSTANTS.FRAME_START_BYTE;               // start byte
             result[1] = (byte)(data_length >> 8);           // data length MSB
             result[2] = (byte)data_length;                  // data length LSB
             result[3] = CONSTANTS.FT_TRANSMIT;              // frame type
@@ -56,10 +54,7 @@ namespace AbaciConnect.Relay
             result[16] = options;                           // transmission options
             for (int i = 0; i < data.Length; i++)
                 result[i + 17] = data[i];                   // data
-            byte byte_sum = 0;
-            for (int i = 0; i < data_length; i++)
-                byte_sum += result[3 + i];
-            byte checksum = (byte)(0xFF - byte_sum);
+            byte checksum = Checksum.Calculate(result.Skip(3).Take(total_length - 3 - 1)); // skip first 3 bytes and last byte
             result[total_length - 1] = checksum;            // checksum
             return result;
         }
