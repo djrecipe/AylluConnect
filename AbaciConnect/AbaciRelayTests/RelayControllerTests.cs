@@ -1,13 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AbaciConnect.Relay;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
+using System.Linq;
 using System.IO;
+using AbaciConnect.Relay;
 using AbaciConnect.Relay.Emission;
 using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Processors;
+using AbaciConnect.Relay.TransmissionObjects;
 
 namespace AbaciConnect.RelayTests
 {
@@ -15,7 +17,7 @@ namespace AbaciConnect.RelayTests
     public class RelayControllerTests
     {
         [TestMethod]
-        public void SendLargeDataStream()
+        public void SendData()
         {
             string text = "";
             int expected_byte_count = CONSTANTS.MAX_FRAME_DATA;
@@ -46,139 +48,80 @@ namespace AbaciConnect.RelayTests
             }
         }
         [TestMethod]
-        public void SendAndReceiveSmallDataStream()
+        public void ScrambleAndTransmit()
         {
-            string text = "";
-            int expected_byte_count = 10;
+            int expected_byte_count = 1000;
+            uint expected_object_id = 5;
+            byte[] raw_bytes = new byte[expected_byte_count];
             for (int i = 0; i < expected_byte_count; i++)
             {
-                text += "x";
+                raw_bytes[i] = (byte)i;
             }
-            byte[] data_bytes = Encoding.UTF8.GetBytes(text);
+            TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory();
             using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
             {
-                using (RelayController ctrl_receive = RelayController.ConnectSerial("COM6"))
-                {
-                    ulong long_address = 0x0013A20041B764AD;
-                    ushort short_address = ctrl_send.Discover(long_address);
-                    // receive "Discover" emission
-                    List<byte> rcv_bytes = ctrl_receive.ReceiveBytes();
-                    Assert.AreEqual("Discover".Length, rcv_bytes.Count);
-                    // send ACTUAL data
-                    ctrl_send.SendRawBytes(short_address, data_bytes);
-                    // receive ACTUAL data transmission
-                    rcv_bytes = ctrl_receive.ReceiveBytes();
-                    Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
-                    for (int i = 0; i < expected_byte_count; i++)
-                    {
-                        Assert.AreEqual((byte)'x', rcv_bytes[i]);
-                    }
-                }
-            }
-        }
-        [TestMethod]
-        public void SendAndReceiveLargeDataStream()
-        {
-            string text = "";
-            int expected_byte_count = 10;
-            for (int i = 0; i < expected_byte_count; i++)
-            {
-                text += "x";
-            }
-            byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-            using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
-            {
-                using (RelayController ctrl_receive = RelayController.ConnectSerial("COM6"))
-                {
-                    ulong long_address = 0x0013A20041B764AD;
-                    ushort short_address = ctrl_send.Discover(long_address);
-                    // receive "Discover" emission
-                    List<byte> rcv_bytes = ctrl_receive.ReceiveBytes();
-                    Assert.AreEqual("Discover".Length, rcv_bytes.Count);
-                    for(int i=0; i<1000; i++)
-                    {
-                        // send ACTUAL data
-                        ctrl_send.SendRawBytes(short_address, data_bytes);
-                        // receive ACTUAL data transmission
-                        rcv_bytes = ctrl_receive.ReceiveBytes();
-                        Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
-                        for (int j = 0; j < expected_byte_count; j++)
-                        {
-                            Assert.AreEqual((byte)'x', rcv_bytes[j]);
-                        }
-                    }
-                }
-            }
-        }
-        [TestMethod]
-        public void SendAndReceiveTransmissonObject()
-        {
-            string text = "";
-            for (int i = 0; i < 100; i++)
-            {
-                text += i.ToString()+"\n";
-            }
-            byte[] raw_bytes = Encoding.UTF8.GetBytes(text);
-            using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
-            {
-                ctrl_send.Clear();
                 using (RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
                 {
-                    ctrl_rcv.Clear();
+
+                    ctrl_send.Clear();
                     ulong long_address = 0x0013A20041B764AD;
                     ushort short_address = ctrl_send.Discover(long_address);
                     // receive "Discover" emission
                     List<byte> rcv_bytes = ctrl_rcv.ReceiveBytes();
                     Assert.AreEqual("Discover".Length, rcv_bytes.Count);
                     // send actual data
-                    ctrl_send.Transmit(short_address, raw_bytes);
+                    try
+                    {
+                        TransmissionObject xm = transmissionFactory.Create(raw_bytes, expected_object_id);
+                        byte[] header_bytes = xm.Header.Pack().ToArray();
+                        ctrl_send.SendRawBytes(short_address, header_bytes);
+                        int total_byte_count = header_bytes.Length;
+                        Random rnd = new Random();
+                        IEnumerable<TransmissionChunk> chunks = xm.Chunks.OrderBy(c => rnd.Next());
+                        foreach (TransmissionChunk chunk in chunks)
+                        {
+                            byte[] packet_bytes = chunk.Pack().ToArray();
+                            try
+                            {
+                                ctrl_send.SendRawBytes(short_address, packet_bytes);
+                                total_byte_count += packet_bytes.Length;
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Failed at packet {chunk.Header.ID} after {total_byte_count} bytes");
+                                throw e;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                        Console.WriteLine("Transmission failed");
+                    }
+                    List<EmissionDescriptor> emissions = ctrl_send.GetAllEmissions();
+                    foreach (EmissionDescriptor descriptor in emissions)
+                    {
+                        Console.WriteLine($"Unused emission with frame type {descriptor.Header.FrameType}");
+                    }
                     // receive actual data
-                    rcv_bytes = ctrl_rcv.ReceiveTransmission(0);
-                    Assert.AreEqual(raw_bytes.Length, rcv_bytes.Count);
-                    File.WriteAllBytes("SendAndReceiveTransmissonObject.txt", rcv_bytes.ToArray());
+                    rcv_bytes = ctrl_rcv.ReceiveTransmission(expected_object_id);
+                    Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
+                    for (int i = 0; i < expected_byte_count; i++)
+                    {
+                        Assert.AreEqual(raw_bytes[i], rcv_bytes[i]);
+                    }
                 }
             }
         }
         [TestMethod]
-        public void SendLargeTransmissonObject()
+        public void TransmitLargeObject()
         {
-            string text = "";
-            for (int i = 0; i < 20000; i++)
+            int expected_byte_count = 20000;
+            byte[] raw_bytes = new byte[expected_byte_count];
+            for(int i=0; i< expected_byte_count; i++)
             {
-                text += "x";
+                raw_bytes[i]=(byte)i;
             }
-            byte[] raw_bytes = Encoding.UTF8.GetBytes(text);
-            using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
-            {
-                ctrl_send.Clear();
-                ulong long_address = 0x0013A20041B764AD;
-                ushort short_address = ctrl_send.Discover(long_address);
-                // send actual data
-                try
-                {
-                    ctrl_send.Transmit(short_address, raw_bytes);
-                }
-                catch
-                {
-                    // ignored
-                    Console.WriteLine("Transmission failed");
-                }
-                List<EmissionDescriptor> emissions = ctrl_send.GetAllEmissions();
-                foreach(EmissionDescriptor descriptor in emissions)
-                {
-                    Console.WriteLine($"Unused emission with frame type {descriptor.Header.FrameType}");
-                }
-            }
-        }
-        [TestMethod]
-        public void SendAndReceiveLargeTransmissonObject()
-        {
-            string text = "";
-            for (int i = 0; i < 10000; i++)
-            {
-                text += i.ToString()+"\r\n";
-            }
-            byte[] raw_bytes = Encoding.UTF8.GetBytes(text);
             using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
             {
                 using(RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
@@ -207,8 +150,11 @@ namespace AbaciConnect.RelayTests
                     }
                     // receive actual data
                     rcv_bytes = ctrl_rcv.ReceiveTransmission(0);
-                    File.WriteAllBytes("SendAndReceiveLargeTransmissonObject.txt", rcv_bytes.ToArray());
-                    Assert.AreEqual(raw_bytes.Length, rcv_bytes.Count);
+                    Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
+                    for(int i=0; i< expected_byte_count; i++)
+                    {
+                        Assert.AreEqual(raw_bytes[i], rcv_bytes[i]);
+                    }
                 }
             }
         }

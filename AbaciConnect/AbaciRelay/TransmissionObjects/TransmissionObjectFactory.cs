@@ -38,7 +38,7 @@ namespace AbaciConnect.Relay.TransmissionObjects
         public List<byte> GetDataBytes(TransmissionObject obj)
         {
             List<byte> bytes = new List<byte>();
-            foreach(TransmissionChunk packet in obj.Packets.OrderBy(p => p.Header.ID))
+            foreach(TransmissionChunk packet in obj.Chunks.OrderBy(p => p.Header.ID))
             {
                 bytes.AddRange(packet.Data);
             }

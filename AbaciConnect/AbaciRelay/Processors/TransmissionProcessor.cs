@@ -24,7 +24,7 @@ namespace AbaciConnect.Relay.Processors
             this.transmissions.Clear();
             this.mutexTransmissions.ReleaseMutex();
         }
-        public void RemoveTransmission(int id)
+        public void RemoveTransmission(uint id)
         {
             this.transmissions.RemoveAll(em => em.Header.ID == id);
         }
@@ -95,7 +95,7 @@ namespace AbaciConnect.Relay.Processors
             this.mutexTransmissions.ReleaseMutex();
             return;
         }
-        public TransmissionObject WaitForTransmission(int id)
+        public TransmissionObject WaitForTransmission(uint id)
         {
             TransmissionObject desc = null;
             while (desc == null)
