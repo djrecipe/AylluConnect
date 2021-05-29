@@ -70,7 +70,10 @@ namespace AbaciConnect.Relay
             {
                 int current_byte = port.ReadByte();
                 if(current_byte != -1)
+                { 
                     local_bytes.Add((byte)current_byte);
+                    Console.WriteLine($"Port {this.port.PortName} received {current_byte:X2}");
+                }
             }
             this.mutexPort.ReleaseMutex();
             //// add bytes to thread-safe queue

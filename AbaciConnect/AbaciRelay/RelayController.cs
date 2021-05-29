@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AbaciConnect.Relay.EmissionStructures;
 
 namespace AbaciConnect.Relay
 {
@@ -17,8 +18,6 @@ namespace AbaciConnect.Relay
         private readonly IByteReceiver receiver = null;
         private readonly IRelay relay = null;
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
-        private readonly EmissionDecoder emissionDecoder = new EmissionDecoder();
-        private readonly StructFactory structFactory = new StructFactory();
         private RelayController(IRelay relay_in, IByteReceiver receiver_in)
         {
             this.relay = relay_in;
@@ -30,18 +29,25 @@ namespace AbaciConnect.Relay
         }
         public ushort Discover(ulong address)
         {
-            string text = "Discover";
+            string text = CONSTANTS.DISCOVER;
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             byte[] bytes = factory.CreateSendDataFrame(address, data_bytes);
             relay.SendBytes(bytes);
             //
             EmissionDescriptor desc = this.receiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
-            ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                desc.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
-            ushort short_address = (ushort)(((ushort)response.AddressH << 8) | response.AddressL);
+            ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
+            response.Unpack(desc.Data);
             if(response.DeliveryStatus !=0)
                 throw new Exception($"Error while discovering full address for {address}");
-            return short_address;
+            return response.Address;
+        }
+        public List<byte> ReceiveBytes()
+        {
+            EmissionDescriptor desc = this.receiver.WaitForEmission(EmissionTypes.ReceivePacket);
+            this.receiver.RemoveEmission(desc.ID);
+            ReceivePacketEmission response = new ReceivePacketEmission();
+            response.Unpack(desc.Data);
+            return response.Data;
         }
         public void SendBytes(ushort address, byte[] data)
         {
@@ -54,8 +60,8 @@ namespace AbaciConnect.Relay
                 this.relay.SendBytes(frame_bytes);
                 //
                 EmissionDescriptor desc = this.receiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
-                ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                    desc.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
+                ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
+                response.Unpack(desc.Data);
                 if (response.DeliveryStatus != 0)
                     throw new Exception($"Error during data transmission to {address} ({i}\\{data.Length})");
             }

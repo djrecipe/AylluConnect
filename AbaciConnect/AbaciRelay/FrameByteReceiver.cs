@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using AbaciConnect.Relay.EmissionStructures;
 
 namespace AbaciConnect.Relay
 {
@@ -11,8 +12,7 @@ namespace AbaciConnect.Relay
     {
         private readonly Mutex mutexEmissions = new Mutex();
         private readonly List<EmissionDescriptor> emissions = new List<EmissionDescriptor>();
-        private readonly EmissionDecoder emissionDecoder = new EmissionDecoder();
-        private EmissionHeaderDescriptor currentDescriptor = null;
+        private EmissionHeader currentHeader = new EmissionHeader();
         private List<byte> pendingBytes = new List<byte>();
         public enum ReceiveStates : int
         {
@@ -66,28 +66,31 @@ namespace AbaciConnect.Relay
         private bool ReceiveFrame()
         {
             // check if enough bytes ready
-            ushort required_count = this.currentDescriptor.Length;
+            ushort required_count = this.currentHeader.Length;
             if(this.pendingBytes.Count < required_count)
                 return false;
             this.ReceiveState = ReceiveStates.ReceiveStartByte;
             // create emission description
             this.mutexEmissions.WaitOne();
-            this.emissions.Add(new EmissionDescriptor(this.currentDescriptor, this.pendingBytes.Take(required_count).ToList()));
+            this.emissions.Add(new EmissionDescriptor(this.currentHeader, this.pendingBytes.Take(required_count).ToList()));
             this.mutexEmissions.ReleaseMutex();
             // remove emission bytes
             this.pendingBytes.RemoveRange(0, required_count);
             return true;
         }
+        public void RemoveEmission(ulong id)
+        {
+            this.emissions.RemoveAll(em => em.ID == id);
+        }
         private bool ReceiveHeader()
         {
             // check if enough bytes ready
-            int required_count = 4;
+            int required_count = CONSTANTS.EMISSION_HEADER_SIZE;
             if (this.pendingBytes.Count < required_count)
                 return false;
             this.ReceiveState = ReceiveStates.ReceiveFrame;
             // decode header
-            EmissionHeaderDescriptor descriptor = this.emissionDecoder.Decode(this.pendingBytes.Take(4).ToArray());
-            this.currentDescriptor = descriptor;
+            this.currentHeader.Unpack(this.pendingBytes.Take(required_count).ToList());
             // remove header bytes
             this.pendingBytes.RemoveRange(0, required_count);
             return true;
@@ -98,7 +101,7 @@ namespace AbaciConnect.Relay
             while(desc == null)
             {
                 this.mutexEmissions.WaitOne();
-                int index = this.emissions.FindIndex(em => em.Header.Type == type);
+                int index = this.emissions.FindIndex(em => em.Header.FrameType == type);
                 if(index > -1)
                 {
                     desc = this.emissions[index];

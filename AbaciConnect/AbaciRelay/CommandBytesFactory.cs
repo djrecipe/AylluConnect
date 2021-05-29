@@ -6,13 +6,6 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay
 {
-    public enum CommandOperations : int
-    {
-        SetName=0,
-        SetNetworkSettings=1,
-        SendDataL=2,
-        SendDataS=3
-    }
     public class CommandBytesFactory
     {
         private static byte currentFrameId = 1;

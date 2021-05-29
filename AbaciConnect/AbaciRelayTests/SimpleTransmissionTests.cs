@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AbaciConnect.Relay;
+using AbaciConnect.Relay.EmissionStructures;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -12,8 +13,6 @@ namespace AbaciConnect.RelayTests
     public class SimpleTransmissionTests
     {
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
-        private readonly StructFactory structFactory = new StructFactory();
-        private readonly EmissionDecoder emissionDecoder = new EmissionDecoder();
         private readonly FrameByteReceiver byteReceiver = new FrameByteReceiver();
         [TestMethod]
         public void OpenAndClose()
@@ -55,8 +54,8 @@ namespace AbaciConnect.RelayTests
             {
                 relay.SendBytes(bytes);
                 EmissionDescriptor em = this.byteReceiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
-                ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                    em.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
+                ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
+                response.Unpack(em.Data);
                 Console.WriteLine("Frame ID: {0}; Result: {1}",
                     response.FrameID, response.DeliveryStatus);
                 Assert.AreEqual(0, response.DeliveryStatus);
@@ -78,20 +77,18 @@ namespace AbaciConnect.RelayTests
             {
                 relay.SendBytes(bytes);
                 EmissionDescriptor em = this.byteReceiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
-                ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                    em.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
-                Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
-                    response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
-                ushort short_address = (ushort)(((ushort)response.AddressH<<8)|response.AddressL);
-                bytes = factory.CreateSendDataFrame(short_address, data_bytes);
+                ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
+                response.Unpack(em.Data);
+                Console.WriteLine("ID: {0}; Address: 0x{1:X4}; Result: 0x{2:X2}",
+                    response.FrameID, response.Address, response.DeliveryStatus);
+                bytes = factory.CreateSendDataFrame(response.Address, data_bytes);
                 for (int i = 0; i < 100; i++)
                 {
                     relay.SendBytes(bytes);
                     em = this.byteReceiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
-                    response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                        em.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
-                    Console.WriteLine("ID: {0}; Address: 0x{1:X2}{2:X2}; Result: 0x{3:X2}",
-                        response.FrameID, response.AddressH, response.AddressL, response.DeliveryStatus);
+                    response.Unpack(em.Data);
+                    Console.WriteLine("ID: {0}; Address: 0x{1:X4}; Result: 0x{2:X2}",
+                        response.FrameID, response.Address, response.DeliveryStatus);
                     Assert.AreEqual(0, response.DeliveryStatus);
                     //System.Threading.Thread.Sleep(10);
                 }
