@@ -16,10 +16,12 @@ namespace AbaciConnect.Relay
         private readonly SerialPort port = null;
         private readonly BackgroundWorker workerWrite = new BackgroundWorker();
         private readonly Mutex mutexPort = new Mutex();
-        private readonly Mutex mutexBytes = new Mutex();
-        private List<byte> byteQueue = new List<byte>();
-        public SerialRelay(string name)
+        private readonly IByteReceiver receiver;
+        public SerialRelay(string name, IByteReceiver receiver_in)
         {
+            //
+            this.receiver = receiver_in;
+            //
             this.workerWrite.DoWork += this.workerWrite_DoWork;
             //
             port = new SerialPort(name);
@@ -52,33 +54,6 @@ namespace AbaciConnect.Relay
         {
             Write(data);
         }
-        public List<byte> WaitForBytes(int count)
-        {
-            List<byte> local_bytes = new List<byte>();
-            // wait for bytes
-            while(true)
-            {
-                this.mutexBytes.WaitOne();
-                // check if new bytes received
-                if(this.byteQueue.Count > 0)
-                {
-                    // determine number of remaining bytes desired
-                    int remaining = count - local_bytes.Count;
-                    // determine number of bytes to take
-                    int take_count = Math.Min(this.byteQueue.Count, remaining);
-                    // copy the bytes
-                    local_bytes.AddRange(this.byteQueue.Take(take_count));
-                    // remove bytes from queue
-                    this.byteQueue.RemoveRange(0, take_count);
-                }
-                this.mutexBytes.ReleaseMutex();
-                // check if recieved desired byte count
-                if (local_bytes.Count >= count)
-                    break;
-            }
-            // return bytes
-            return local_bytes;
-        }
         private void Write(byte[] data)
         {
             while(this.workerWrite.IsBusy);
@@ -98,10 +73,11 @@ namespace AbaciConnect.Relay
                     local_bytes.Add((byte)current_byte);
             }
             this.mutexPort.ReleaseMutex();
-            // add bytes to thread-safe queue
-            this.mutexBytes.WaitOne();
-            this.byteQueue.AddRange(local_bytes);
-            this.mutexBytes.ReleaseMutex();
+            //// add bytes to thread-safe queue
+            //this.mutexBytes.WaitOne();
+            //this.byteQueue.AddRange(local_bytes);
+            //this.mutexBytes.ReleaseMutex();
+            this.receiver.ReceiveBytes(local_bytes);
             return;
         }
         private void SerialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)

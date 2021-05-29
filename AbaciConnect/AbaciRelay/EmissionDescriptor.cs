@@ -7,20 +7,15 @@ using System.Threading.Tasks;
 namespace AbaciConnect.Relay
 {
     public class EmissionDescriptor
-    {
-        private static readonly Dictionary<byte, Type> Types = new Dictionary<byte, Type>
+    { 
+        private readonly EmissionHeaderDescriptor header=null;
+        private readonly List<byte> data=null;
+        public EmissionHeaderDescriptor Header => this.header;
+        public List<byte> Data => new List<byte>(this.data);
+        public EmissionDescriptor(EmissionHeaderDescriptor header_in, List<byte> data_in)
         {
-            { CONSTANTS.EM_XTRANSMIT_STATUS, typeof(ExtendedTransmitStatus)},
-        };
-        public Type Type { get;set;}
-        public ushort Length { get;set;}
-        internal EmissionDescriptor(EmissionHeader header)
-        {
-            Type type;
-            if(!Types.TryGetValue(header.FrameType, out type))
-                throw new NotSupportedException($"Emission header frame type not supported ({header.FrameType})");
-            this.Type = type;
-            this.Length = (ushort)(((ushort)header.LengthH << 8) | header.LengthL);
+            this.header = header_in;
+            this.data=new List<byte>(data_in);
         }
     }
 }

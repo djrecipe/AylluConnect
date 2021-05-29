@@ -9,6 +9,5 @@ namespace AbaciConnect.Relay
     interface IRelay : IDisposable
     {
         public void SendBytes(byte[] data);
-        public List<byte> WaitForBytes(int count);
     }
 }

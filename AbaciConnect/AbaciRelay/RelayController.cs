@@ -10,16 +10,19 @@ namespace AbaciConnect.Relay
     {
         public static RelayController ConnectSerial(string port)
         {
-            IRelay relay = new SerialRelay(port);
-            return new RelayController(relay);
+            IByteReceiver receiver = new FrameByteReceiver();
+            IRelay relay = new SerialRelay(port, receiver);
+            return new RelayController(relay, receiver);
         }
+        private readonly IByteReceiver receiver = null;
         private readonly IRelay relay = null;
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
         private readonly EmissionDecoder emissionDecoder = new EmissionDecoder();
         private readonly StructFactory structFactory = new StructFactory();
-        private RelayController(IRelay relay_in)
+        private RelayController(IRelay relay_in, IByteReceiver receiver_in)
         {
             this.relay = relay_in;
+            this.receiver = receiver_in;
         }
         public void Dispose()
         {
@@ -31,13 +34,10 @@ namespace AbaciConnect.Relay
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             byte[] bytes = factory.CreateSendDataFrame(address, data_bytes);
             relay.SendBytes(bytes);
-            List<byte> response_bytes = relay.WaitForBytes(CONSTANTS.EMISSION_HEADER_SIZE);
-            // TODO 5/27/21: move all emission response code to be asynchronous and in response to serial receives, and then fitler through those responses
-            EmissionDescriptor em_desc = this.emissionDecoder.Decode(response_bytes.ToArray());
-            response_bytes = relay.WaitForBytes(em_desc.Length);
-            // 
+            //
+            EmissionDescriptor desc = this.receiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
             ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                response_bytes.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
+                desc.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
             ushort short_address = (ushort)(((ushort)response.AddressH << 8) | response.AddressL);
             if(response.DeliveryStatus !=0)
                 throw new Exception($"Error while discovering full address for {address}");
@@ -52,13 +52,10 @@ namespace AbaciConnect.Relay
                 Array.Copy(data, i, current_data_bytes, 0, current_count);
                 byte[] frame_bytes = factory.CreateSendDataFrame(address, current_data_bytes);
                 this.relay.SendBytes(frame_bytes);
-                List<byte> response_bytes = relay.WaitForBytes(CONSTANTS.EMISSION_HEADER_SIZE);
-                // TODO 5/27/21: move all emission response code to be asynchronous and in response to serial receives, and then fitler through those responses
-                EmissionDescriptor em_desc = this.emissionDecoder.Decode(response_bytes.ToArray());
-                response_bytes = relay.WaitForBytes(em_desc.Length);
-                // 
+                //
+                EmissionDescriptor desc = this.receiver.WaitForEmission(EmissionTypes.ExtendedTransmitStatus);
                 ExtendedTransmitStatus response = this.structFactory.Unpack<ExtendedTransmitStatus>(
-                    response_bytes.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
+                    desc.Data.ToArray(), CONSTANTS.XTRANSMIT_RESPONSE_SIZE);
                 if (response.DeliveryStatus != 0)
                     throw new Exception($"Error during data transmission to {address} ({i}\\{data.Length})");
             }
