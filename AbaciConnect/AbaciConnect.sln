@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciContracts", "AbaciContracts\AbaciContracts.csproj", "{1E62486D-4DBA-440B-94D4-F1E5915DEA7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciRelay", "AbaciRelay\AbaciRelay.csproj", "{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciConnectConsole", "AbaciConnectConsole\AbaciConnectConsole.csproj", "{ED273FD6-DF17-4B46-9B70-4CE6C73A1FF3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciRelay", "AbaciRelay\AbaciRelay.csproj", "{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciRelayTests", "AbaciRelayTests\AbaciRelayTests.csproj", "{33C00C98-E378-4923-B546-19AEC33C441D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciRelayTests", "AbaciRelayTests\AbaciRelayTests.csproj", "{33C00C98-E378-4923-B546-19AEC33C441D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1E62486D-4DBA-440B-94D4-F1E5915DEA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E62486D-4DBA-440B-94D4-F1E5915DEA7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E62486D-4DBA-440B-94D4-F1E5915DEA7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E62486D-4DBA-440B-94D4-F1E5915DEA7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED273FD6-DF17-4B46-9B70-4CE6C73A1FF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED273FD6-DF17-4B46-9B70-4CE6C73A1FF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED273FD6-DF17-4B46-9B70-4CE6C73A1FF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED273FD6-DF17-4B46-9B70-4CE6C73A1FF3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}.Release|Any CPU.ActiveCfg = Release|Any CPU

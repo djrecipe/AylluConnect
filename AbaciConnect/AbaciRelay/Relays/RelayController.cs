@@ -23,7 +23,6 @@ namespace AbaciConnect.Relay
         private readonly TransmissionProcessor transmissionProcessor = new TransmissionProcessor();
         private readonly IRelay relay = null;
         private readonly CommandBytesFactory commandFactory = new CommandBytesFactory();
-        private readonly TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory();
         internal RelayController(IRelay relay_in, IEmissionProcessor processor_in)
         {
             this.relay = relay_in;
@@ -67,11 +66,11 @@ namespace AbaciConnect.Relay
             response.Unpack(desc.Data);
             return response.Data;
         }
-        public List<byte> ReceiveTransmission(uint id)
+        public byte[] ReceiveTransmission(uint id)
         {
             TransmissionObject xm = this.transmissionProcessor.WaitForTransmission(id);
             this.transmissionProcessor.RemoveTransmission(id);
-            List<byte> bytes = this.transmissionFactory.GetDataBytes(xm);
+            byte[] bytes = TransmissionObjectFactory.GetData(xm);
             return bytes;
         }
         internal void SendRawBytes(ushort address, byte[] data)
@@ -86,7 +85,7 @@ namespace AbaciConnect.Relay
         }
         public void Transmit(ushort address, byte[] data)
         {
-            TransmissionObject xm = this.transmissionFactory.Create(data, 0);
+            TransmissionObject xm = TransmissionObjectFactory.Create(data, 0);
             byte[] header_bytes = xm.Header.Pack().ToArray();
             this.SendRawBytes(address, header_bytes);
             int total_byte_count = header_bytes.Length;

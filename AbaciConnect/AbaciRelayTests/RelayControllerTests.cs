@@ -57,7 +57,6 @@ namespace AbaciConnect.RelayTests
             {
                 raw_bytes[i] = (byte)i;
             }
-            TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory();
             using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
             {
                 using (RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
@@ -72,7 +71,7 @@ namespace AbaciConnect.RelayTests
                     // send actual data
                     try
                     {
-                        TransmissionObject xm = transmissionFactory.Create(raw_bytes, expected_object_id);
+                        TransmissionObject xm = TransmissionObjectFactory.Create(raw_bytes, expected_object_id);
                         byte[] header_bytes = xm.Header.Pack().ToArray();
                         ctrl_send.SendRawBytes(short_address, header_bytes);
                         int total_byte_count = header_bytes.Length;
@@ -104,11 +103,11 @@ namespace AbaciConnect.RelayTests
                         Console.WriteLine($"Unused emission with frame type {descriptor.Header.FrameType}");
                     }
                     // receive actual data
-                    rcv_bytes = ctrl_rcv.ReceiveTransmission(expected_object_id);
-                    Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
+                    byte[] rcv_data_bytes = ctrl_rcv.ReceiveTransmission(expected_object_id);
+                    Assert.AreEqual(expected_byte_count, rcv_data_bytes.Length);
                     for (int i = 0; i < expected_byte_count; i++)
                     {
-                        Assert.AreEqual(raw_bytes[i], rcv_bytes[i]);
+                        Assert.AreEqual(raw_bytes[i], rcv_data_bytes[i]);
                     }
                 }
             }
@@ -118,9 +117,11 @@ namespace AbaciConnect.RelayTests
         {
             int expected_byte_count = 20000;
             byte[] raw_bytes = new byte[expected_byte_count];
+            Random rnd = new Random();
             for(int i=0; i< expected_byte_count; i++)
             {
-                raw_bytes[i]=(byte)i;
+                //raw_bytes[i] = (byte)rnd.Next();
+                raw_bytes[i] = (byte)'x';
             }
             using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
             {
@@ -149,11 +150,11 @@ namespace AbaciConnect.RelayTests
                         Console.WriteLine($"Unused emission with frame type {descriptor.Header.FrameType}");
                     }
                     // receive actual data
-                    rcv_bytes = ctrl_rcv.ReceiveTransmission(0);
-                    Assert.AreEqual(expected_byte_count, rcv_bytes.Count);
+                    byte[] rcv_data_bytes = ctrl_rcv.ReceiveTransmission(0);
+                    Assert.AreEqual(expected_byte_count, rcv_data_bytes.Length);
                     for(int i=0; i< expected_byte_count; i++)
                     {
-                        Assert.AreEqual(raw_bytes[i], rcv_bytes[i]);
+                        Assert.AreEqual(raw_bytes[i], rcv_data_bytes[i]);
                     }
                 }
             }
