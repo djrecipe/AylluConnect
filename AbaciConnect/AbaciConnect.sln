@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciRelay", "AbaciRelay\Ab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciRelayTests", "AbaciRelayTests\AbaciRelayTests.csproj", "{33C00C98-E378-4923-B546-19AEC33C441D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciAndroid", "AbaciAndroid\AbaciAndroid.csproj", "{6B96E92B-6E6A-435A-A25D-0CE8411F793D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,12 @@ Global
 		{33C00C98-E378-4923-B546-19AEC33C441D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33C00C98-E378-4923-B546-19AEC33C441D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33C00C98-E378-4923-B546-19AEC33C441D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B96E92B-6E6A-435A-A25D-0CE8411F793D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
