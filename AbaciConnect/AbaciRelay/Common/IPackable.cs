@@ -8,10 +8,10 @@ namespace AbaciConnect.Relay.Common
 {
     interface IPackable
     {
-        public List<byte> Pack();
+        List<byte> Pack();
     }
     interface IUnpackable
     {
-         public void Unpack(List<byte> bytes);
+         void Unpack(List<byte> bytes);
     }
 }

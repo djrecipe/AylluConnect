@@ -8,7 +8,7 @@ namespace AbaciConnect.Relay
 {
     interface IRelayController : IDisposable
     {
-        public List<byte> ReceiveBytes();
-        public void Transmit(ushort address, byte[] data);
+        List<byte> ReceiveBytes();
+        void Transmit(ushort address, byte[] data);
     }
 }

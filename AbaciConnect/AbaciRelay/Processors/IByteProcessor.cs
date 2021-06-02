@@ -8,7 +8,7 @@ namespace AbaciConnect.Relay.Processors
 {
     public interface IByteProcessor
     {
-        public byte StartByte { get; }
-        public void Clear();
+        byte StartByte { get; }
+        void Clear();
     }
 }

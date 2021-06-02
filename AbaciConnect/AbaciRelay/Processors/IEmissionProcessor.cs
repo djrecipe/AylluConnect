@@ -7,12 +7,12 @@ using AbaciConnect.Relay.Emission;
 
 namespace AbaciConnect.Relay.Processors
 {
-    interface IEmissionProcessor : IByteProcessor
+    public interface IEmissionProcessor : IByteProcessor
     {
-        public List<EmissionDescriptor> GetAllEmissions();
-        public void ReceiveBytes(List<byte> bytes);
-        public void RemoveEmission(ulong id);
-        public EmissionDescriptor WaitForEmission(EmissionTypes type, int timeout);
-        public event EventHandler<EmissionDescriptor> OnEmission;
+        List<EmissionDescriptor> GetAllEmissions();
+        void ReceiveBytes(List<byte> bytes);
+        void RemoveEmission(ulong id);
+        EmissionDescriptor WaitForEmission(EmissionTypes type, int timeout);
+        event EventHandler<EmissionDescriptor> OnEmission;
     }
 }

@@ -23,7 +23,7 @@ namespace AbaciConnect.Relay
         private readonly TransmissionProcessor transmissionProcessor = new TransmissionProcessor();
         private readonly IRelay relay = null;
         private readonly CommandBytesFactory commandFactory = new CommandBytesFactory();
-        internal RelayController(IRelay relay_in, IEmissionProcessor processor_in)
+        public RelayController(IRelay relay_in, IEmissionProcessor processor_in)
         {
             this.relay = relay_in;
             this.emissionProcessor = processor_in;
