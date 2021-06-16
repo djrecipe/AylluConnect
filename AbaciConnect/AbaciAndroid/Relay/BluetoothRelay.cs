@@ -6,49 +6,46 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using XBeeLibrary.Xamarin;
+using XBeeLibrary.Core.Packet;
 
 namespace AbaciConnect.Android.Relay
 {
     public class BluetoothRelay : IRelay
     {
-        private readonly IAdapter bleAdapter;
-        private readonly IBluetoothLE ble;
-        private readonly List<IDevice> devices = new List<IDevice>();
-        public BluetoothRelay()
+        private readonly XBeeBLEDevice device = null;
+        internal BluetoothRelay(IDevice device_in, string password)
         {
-            this.ble = CrossBluetoothLE.Current;
-            this.ble.StateChanged += Bluetooth_StateChanged;
-            this.bleAdapter = CrossBluetoothLE.Current.Adapter;
-            this.bleAdapter.DeviceDiscovered += Bluetooth_DeviceDiscovered;
-            this.devices.AddRange(this.bleAdapter.GetSystemConnectedOrPairedDevices());
-            foreach(IDevice device in this.devices)
-                Debug.WriteLine($"Discovered {device.Name} ({device.Id})");
+            this.device = new XBeeBLEDevice(device_in, null);
+            this.device.SetBluetoothPassword(password);
+            this.device.Open();
+            this.device.PacketReceived += Device_PacketReceived;
+            this.device.UserDataRelayReceived += Device_UserDataRelayReceived;
+            return;
         }
 
 
         public void ClearBuffer()
         {
         }
-        public void Discover()
-        {
-            this.bleAdapter.ScanMode = ScanMode.LowLatency;
-            this.bleAdapter.ScanTimeout = 5000;
-            this.bleAdapter.StartScanningForDevicesAsync();
-        }
         public void Dispose()
         {
+            if(this.device.IsOpen)
+                this.device.Close();
         }
 
         public void SendBytes(byte[] data)
         {
+            XBeePacket packet = XBeePacket.ParsePacket(data, XBeeLibrary.Core.Models.OperatingMode.API); 
+            this.device.SendPacket(packet);
         }
-        private void Bluetooth_DeviceDiscovered(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
+        private void Device_PacketReceived(object sender, XBeeLibrary.Core.Events.PacketReceivedEventArgs e)
         {
-            Debug.WriteLine($"Discovered {e.Device.Name} ({e.Device.Id})");
+            // 
         }
-        private void Bluetooth_StateChanged(object sender, Plugin.BLE.Abstractions.EventArgs.BluetoothStateChangedArgs e)
+        private void Device_UserDataRelayReceived(object sender, XBeeLibrary.Core.Events.UserDataRelayReceivedEventArgs e)
         {
-            Debug.WriteLine($"Bluetooth state changed to {e.NewState}");
         }
     }
 }

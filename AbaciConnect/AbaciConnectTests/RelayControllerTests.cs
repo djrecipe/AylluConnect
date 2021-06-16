@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -11,8 +11,9 @@ using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Processors;
 using AbaciConnect.Relay.TransmissionObjects;
 
-namespace AbaciConnect.RelayTests
+namespace AbaciConnectTests
 {
+
     [TestClass]
     public class RelayControllerTests
     {
@@ -39,7 +40,7 @@ namespace AbaciConnect.RelayTests
                     {
                         ctrl_send.SendRawBytes(short_address, data_bytes);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Console.WriteLine($"Failed at iteration {i} after {CONSTANTS.MAX_FRAME_DATA * i} bytes");
                         break;
@@ -118,14 +119,14 @@ namespace AbaciConnect.RelayTests
             int expected_byte_count = 20000;
             byte[] raw_bytes = new byte[expected_byte_count];
             Random rnd = new Random();
-            for(int i=0; i< expected_byte_count; i++)
+            for (int i = 0; i < expected_byte_count; i++)
             {
                 //raw_bytes[i] = (byte)rnd.Next();
                 raw_bytes[i] = (byte)'x';
             }
             using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
             {
-                using(RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
+                using (RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
                 {
 
                     ctrl_send.Clear();
@@ -152,7 +153,7 @@ namespace AbaciConnect.RelayTests
                     // receive actual data
                     byte[] rcv_data_bytes = ctrl_rcv.ReceiveTransmission(0);
                     Assert.AreEqual(expected_byte_count, rcv_data_bytes.Length);
-                    for(int i=0; i< expected_byte_count; i++)
+                    for (int i = 0; i < expected_byte_count; i++)
                     {
                         Assert.AreEqual(raw_bytes[i], rcv_data_bytes[i]);
                     }

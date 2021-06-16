@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -8,7 +8,7 @@ using AbaciConnect.Relay.Emission;
 using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Processors;
 
-namespace AbaciConnect.RelayTests
+namespace AbaciConnectTests
 {
     [TestClass]
     [DeploymentItem("SimpleImage.bmp")]
@@ -69,9 +69,9 @@ namespace AbaciConnect.RelayTests
             ulong broadcast = 0x000000000000FFFF;
             ulong long_address = 0x0013A20041B764AD;
             string text = "";
-            for(int i=0; i< CONSTANTS.MAX_FRAME_DATA; i++)
+            for (int i = 0; i < CONSTANTS.MAX_FRAME_DATA; i++)
             {
-                text+="x";
+                text += "x";
             } // looks like 84 is the magic number so that the packets dont fragment; should probably start making a transmission/packet/etc class that can hold arrays of these 84 byte transmissions
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             byte[] bytes = factory.CreateSendDataFrame(long_address, data_bytes, 1);
