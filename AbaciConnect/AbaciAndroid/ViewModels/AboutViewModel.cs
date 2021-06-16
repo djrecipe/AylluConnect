@@ -15,13 +15,15 @@ namespace AbaciAndroid.ViewModels
     { 
         private IRelay relay = null;
         private RelayController relayController = null;
-        private readonly BluetoothRelayFactory relayFactory = new BluetoothRelayFactory();
+        private readonly BluetoothRelayFactory relayFactory = null;
         private readonly IEmissionProcessor processor = new EmissionProcessor();
         public ICommand CommandConnect { get; }
         public ICommand CommandDiscover { get; }
         public ICommand CommandSend{ get; }
         public AboutViewModel()
         {
+            this.relayFactory = new BluetoothRelayFactory(this.processor);
+            //
             Title = "Bluetooth";
             CommandConnect = new Command(() => this.Connect());
             CommandDiscover = new Command(() => this.Discover());
@@ -31,7 +33,7 @@ namespace AbaciAndroid.ViewModels
         {
             try
             {
-                this.relay = this.relayFactory.Create("XBee A", "12345");
+                this.relay = this.relayFactory.Create("XBee B", "12345");
                 this.relayController = new RelayController(this.relay, this.processor);
             }
             catch(Exception e)

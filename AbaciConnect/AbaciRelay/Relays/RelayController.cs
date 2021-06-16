@@ -77,7 +77,7 @@ namespace AbaciConnect.Relay
         {
             byte[] frame_bytes = commandFactory.CreateSendDataFrame(address, data, 1);
             this.relay.SendBytes(frame_bytes);
-            EmissionDescriptor desc = this.emissionProcessor.WaitForEmission(EmissionTypes.ExtendedTransmitStatus, 1000);
+            EmissionDescriptor desc = this.emissionProcessor.WaitForEmission(EmissionTypes.ExtendedTransmitStatus, 10000);
             ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
             response.Unpack(desc.Data);
             if (response.DeliveryStatus != 0)
