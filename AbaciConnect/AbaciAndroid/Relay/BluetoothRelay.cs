@@ -24,9 +24,10 @@ namespace AbaciConnect.Android.Relay
             this.device.PacketReceived += Device_PacketReceived;
             this.device.SerialDataReceived += Device_SerialDataReceived;
             this.device.UserDataRelayReceived += Device_UserDataRelayReceived;
-            this.device.ReceiveTimeout = 5000;
+            this.device.ReceiveTimeout = 1000;
             this.device.SetBluetoothPassword(password);
             this.device.Open();
+            this.device.EnableBluetooth();
             return;
         }
 
