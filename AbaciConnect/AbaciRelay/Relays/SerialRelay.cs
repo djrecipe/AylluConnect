@@ -10,6 +10,7 @@ using System.Threading;
 using System.Linq;
 
 using AbaciConnect.Relay.Processors;
+using AbaciConnect.Relay.TransmissionObjects;
 
 namespace AbaciConnect.Relay
 {
@@ -19,8 +20,12 @@ namespace AbaciConnect.Relay
         private readonly BackgroundWorker workerWrite = new BackgroundWorker();
         private readonly Mutex mutexPort = new Mutex();
         private readonly IEmissionProcessor receiver;
+
+        public ITransmissionObjectFormatter TranmissionFormatter {get; private set; }
+
         public SerialRelay(string name, IEmissionProcessor receiver_in)
         {
+            this.TranmissionFormatter = new ApiFrameTransmissionObjectFormatter();
             //
             this.receiver = receiver_in;
             //

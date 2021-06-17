@@ -22,7 +22,6 @@ namespace AbaciConnect.Relay
         private readonly IEmissionProcessor emissionProcessor = null;
         private readonly TransmissionProcessor transmissionProcessor = new TransmissionProcessor();
         private readonly IRelay relay = null;
-        private readonly CommandBytesFactory commandFactory = new CommandBytesFactory();
         public RelayController(IRelay relay_in, IEmissionProcessor processor_in)
         {
             this.relay = relay_in;
@@ -44,7 +43,7 @@ namespace AbaciConnect.Relay
         {
             string text = CONSTANTS.DISCOVER;
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-            byte[] bytes = commandFactory.CreateSendDataFrame(address, data_bytes, 1);
+            byte[] bytes = this.relay.TranmissionFormatter.FormatDataBytes(address, data_bytes);
             relay.SendBytes(bytes);
             //
             EmissionDescriptor desc = this.emissionProcessor.WaitForEmission(EmissionTypes.ExtendedTransmitStatus, 1000);
@@ -75,7 +74,9 @@ namespace AbaciConnect.Relay
         }
         internal void SendRawBytes(ushort address, byte[] data)
         {
-            byte[] frame_bytes = commandFactory.CreateSendDataFrame(address, data, 1);
+            if(data.Length < 1)
+                return;
+            byte[] frame_bytes = this.relay.TranmissionFormatter.FormatDataBytes(address, data);
             this.relay.SendBytes(frame_bytes);
             EmissionDescriptor desc = this.emissionProcessor.WaitForEmission(EmissionTypes.ExtendedTransmitStatus, 1000);
             ExtendedTransmitStatusEmission response = new ExtendedTransmitStatusEmission();
@@ -86,9 +87,10 @@ namespace AbaciConnect.Relay
         public void Transmit(ushort address, byte[] data)
         {
             TransmissionObject xm = TransmissionObjectFactory.Create(data, 0);
-            byte[] header_bytes = xm.Header.Pack().ToArray();
-            this.SendRawBytes(address, header_bytes);
-            int total_byte_count = header_bytes.Length;
+            byte[] header_bytes = this.relay.TranmissionFormatter.GetHeaderBytes(xm);
+            if(header_bytes != null)
+                this.SendRawBytes(address, header_bytes);
+            int total_byte_count = header_bytes?.Length ?? 0;
             foreach(TransmissionChunk chunk in xm.Chunks)
             {
                 byte[] chunk_bytes = chunk.Pack().ToArray();

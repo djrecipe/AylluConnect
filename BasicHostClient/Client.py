@@ -5,6 +5,7 @@ from sys import stdin, stdout
 def rx_callback(packet):
     micropython.kbd_intr(-1)
     if(packet != None):
+        
         stdout.buffer.write(packet["payload"])
     micropython.kbd_intr(3)
         #for i in range(0,3):

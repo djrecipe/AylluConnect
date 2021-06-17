@@ -10,6 +10,7 @@ using System.Linq;
 using XBeeLibrary.Xamarin;
 using XBeeLibrary.Core.Packet;
 using AbaciConnect.Relay.Processors;
+using AbaciConnect.Relay.TransmissionObjects;
 
 namespace AbaciConnect.Android.Relay
 {
@@ -17,8 +18,11 @@ namespace AbaciConnect.Android.Relay
     {
         private readonly XBeeBLEDevice device = null;
         private readonly IEmissionProcessor receiver;
+        public ITransmissionObjectFormatter TranmissionFormatter { get; private set; }
         internal BluetoothRelay(IDevice device_in, string password, IEmissionProcessor receiver_in)
         {
+            //
+            this.TranmissionFormatter = new RawDataTransmissionObjectFormatter();
             this.receiver = receiver_in;
             this.device = new XBeeBLEDevice(device_in, null);
             this.device.PacketReceived += Device_PacketReceived;
@@ -46,8 +50,7 @@ namespace AbaciConnect.Android.Relay
                 throw new Exception("Error while sending data via bluetooth: device not open");
             if(!this.device.IsInitialized)
                 throw new Exception("Error while sending data via bluetooth: device not initialized");
-            XBeePacket packet = XBeePacket.ParsePacket(data, XBeeLibrary.Core.Models.OperatingMode.API); 
-            this.device.SendPacketAsync(packet);
+            this.device.SendUserDataRelay(XBeeLibrary.Core.Models.XBeeLocalInterface.MICROPYTHON, data);
         }
         private void Device_PacketReceived(object sender, XBeeLibrary.Core.Events.PacketReceivedEventArgs e)
         {

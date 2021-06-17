@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AbaciConnect.Relay.TransmissionObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace AbaciConnect.Relay
 {
     public interface IRelay : IDisposable
     {
+        ITransmissionObjectFormatter TranmissionFormatter { get;}
         void ClearBuffer();
         void SendBytes(byte[] data);
     }

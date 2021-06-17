@@ -33,7 +33,7 @@ namespace AbaciAndroid.ViewModels
         {
             try
             {
-                this.relay = this.relayFactory.Create("XBee B", "12345");
+                this.relay = this.relayFactory.Create("XBee A", "12345");
                 this.relayController = new RelayController(this.relay, this.processor);
             }
             catch(Exception e)
