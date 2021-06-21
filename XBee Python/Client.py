@@ -3,7 +3,7 @@ import xbee, time
 import micropython
 from sys import stdin, stdout
 def rx_callback(packet):
-    micropython.kbd_intr(-1)
+    micropython.kbd_intr(-1 )
     if(packet != None):
         
         stdout.buffer.write(packet["payload"])

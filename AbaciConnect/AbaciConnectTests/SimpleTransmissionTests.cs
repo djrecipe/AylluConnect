@@ -15,7 +15,7 @@ namespace AbaciConnectTests
     public class SimpleTransmissionTests
     {
         private readonly CommandBytesFactory factory = new CommandBytesFactory();
-        private readonly EmissionProcessor byteReceiver = new EmissionProcessor();
+        private readonly ApiFrameEmissionProcessor byteReceiver = new ApiFrameEmissionProcessor();
         [TestMethod]
         public void OpenAndClose()
         {

@@ -15,7 +15,7 @@ namespace AbaciConnect.Relay
     {
         public static RelayController ConnectSerial(string port)
         {
-            IEmissionProcessor processor = new EmissionProcessor();
+            IEmissionProcessor processor = new ApiFrameEmissionProcessor();
             IRelay relay = new SerialRelay(port, processor);
             return new RelayController(relay, processor);
         }

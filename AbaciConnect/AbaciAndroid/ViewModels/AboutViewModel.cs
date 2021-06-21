@@ -16,7 +16,7 @@ namespace AbaciAndroid.ViewModels
         private IRelay relay = null;
         private RelayController relayController = null;
         private readonly BluetoothRelayFactory relayFactory = null;
-        private readonly IEmissionProcessor processor = new EmissionProcessor();
+        private readonly IEmissionProcessor processor = new CustomEmissionProcessor();
         public ICommand CommandConnect { get; }
         public ICommand CommandDiscover { get; }
         public ICommand CommandSend{ get; }
@@ -51,7 +51,7 @@ namespace AbaciAndroid.ViewModels
             {
                 string text = "test";
                 byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-                IEmissionProcessor receiver = new EmissionProcessor();
+                IEmissionProcessor receiver = new ApiFrameEmissionProcessor();
                 ulong long_address = 0x0013A20041B764AD;
                 ushort short_address = this.relayController.Discover(long_address);
                 this.relayController.Transmit(short_address, data_bytes);

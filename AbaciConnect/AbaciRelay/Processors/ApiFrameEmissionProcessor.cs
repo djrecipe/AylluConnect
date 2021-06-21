@@ -9,7 +9,7 @@ using AbaciConnect.Relay.Emission;
 
 namespace AbaciConnect.Relay.Processors
 {
-    public class EmissionProcessor : IEmissionProcessor
+    public class ApiFrameEmissionProcessor : IEmissionProcessor
     {
         private readonly Mutex mutexEmissions = new Mutex();
         private readonly Mutex mutexBytes = new Mutex();

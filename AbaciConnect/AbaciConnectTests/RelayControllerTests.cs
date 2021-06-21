@@ -27,7 +27,7 @@ namespace AbaciConnectTests
                 text += "x";
             }
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
-            IEmissionProcessor receiver = new EmissionProcessor();
+            IEmissionProcessor receiver = new ApiFrameEmissionProcessor();
             IRelay relay = new SerialRelay("COM4", receiver);
             using (RelayController ctrl_send = new RelayController(relay, receiver))
             {
