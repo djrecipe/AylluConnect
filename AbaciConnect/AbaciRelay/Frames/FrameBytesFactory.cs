@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbaciConnect.Relay
+namespace AbaciConnect.Relay.Frames
 {
-    public class FrameBytesFactory
+    public class FrameBytesFactory : ITransmissionFactory
     {
         public byte[] CreateATCommand(string command, byte[] value, byte frame_id, bool queue)
         {
@@ -35,7 +35,7 @@ namespace AbaciConnect.Relay
             ushort total_length = (ushort)(data_length + 4);
             byte[] result = new byte[total_length];
             //
-            result[0] = CONSTANTS.FRAME_START_BYTE;               // start byte
+            result[0] = CONSTANTS.FRAME_START_BYTE;         // start byte
             result[1] = (byte)(data_length >> 8);           // data length MSB
             result[2] = (byte)data_length;                  // data length LSB
             result[3] = CONSTANTS.FT_TRANSMIT;              // frame type

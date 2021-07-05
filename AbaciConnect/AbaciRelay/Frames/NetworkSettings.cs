@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbaciConnect.Relay
+namespace AbaciConnect.Relay.Frames
 {
     public enum DeviceRoles : byte
     {

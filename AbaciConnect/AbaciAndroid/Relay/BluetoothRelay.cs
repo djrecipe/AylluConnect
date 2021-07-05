@@ -22,7 +22,7 @@ namespace AbaciConnect.Android.Relay
         internal BluetoothRelay(IDevice device_in, string password, IEmissionProcessor receiver_in)
         {
             //
-            this.TranmissionFormatter = new RawDataTransmissionObjectFormatter();
+            this.TranmissionFormatter = new CustomTransmissionObjectFormatter();
             this.receiver = receiver_in;
             this.device = new XBeeBLEDevice(device_in, null);
             this.device.PacketReceived += Device_PacketReceived;

@@ -7,6 +7,7 @@ using AbaciConnect.Relay;
 using AbaciConnect.Relay.Emission;
 using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Processors;
+using AbaciConnect.Relay.Frames;
 
 namespace AbaciConnectTests
 {
@@ -14,7 +15,7 @@ namespace AbaciConnectTests
     [DeploymentItem("SimpleImage.bmp")]
     public class SimpleTransmissionTests
     {
-        private readonly CommandBytesFactory factory = new CommandBytesFactory();
+        private readonly CommandBytesFactory factory = new CommandBytesFactory(new FrameBytesFactory());
         private readonly ApiFrameEmissionProcessor byteReceiver = new ApiFrameEmissionProcessor();
         [TestMethod]
         public void OpenAndClose()

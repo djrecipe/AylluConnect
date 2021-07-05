@@ -7,9 +7,14 @@ import time
 # bluetooth relay callback
 def ble_callback(relay_frame):
   if relay_frame is not None:
-    data = relay_frame["message"]
+    raw_data = relay_frame["message"]
+    start_byte,data_length,addr0,addr1,addr2,addr3,addr4,addr5,addr6,addr7,xmit_data = unpack('<bhbbbbbbbbs', raw_data)
+    if(start_byte != 0x7e)
+        return
+    dest_addr = bytes([addr0,addr1,addr2,addr3,addr4,addr5,addr6,addr7])
     try:
-        xbee.transmit(bytes([0x00,0x13,0xA2,0x00,0x41,0xB7,0x64,0xAD]), data)
+        xbee.transmit(dest_addr, bytes(xmit_data, 'utf-8'))
+        # TODO 06/21/21: create a response frame
         relay.send(relay.BLUETOOTH, "success")
     except Exception as e:
         # TODO 06/21/21: create a response frame

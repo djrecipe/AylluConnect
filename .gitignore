@@ -338,3 +338,5 @@ ASALocalRun/
 /hooks
 /lfs
  
+
+**/venv

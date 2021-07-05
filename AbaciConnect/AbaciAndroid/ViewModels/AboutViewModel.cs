@@ -53,8 +53,9 @@ namespace AbaciAndroid.ViewModels
                 byte[] data_bytes = Encoding.UTF8.GetBytes(text);
                 IEmissionProcessor receiver = new ApiFrameEmissionProcessor();
                 ulong long_address = 0x0013A20041B764AD;
-                ushort short_address = this.relayController.Discover(long_address);
-                this.relayController.Transmit(short_address, data_bytes);
+                // TODO 06/28/21: determine how to discover via micropython
+                //ushort short_address = this.relayController.Discover(long_address);
+                this.relayController.Transmit(long_address, data_bytes);
             }
             catch (Exception e)
             {

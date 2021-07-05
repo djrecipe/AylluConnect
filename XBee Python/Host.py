@@ -52,7 +52,7 @@ while(True):
         #xbee.transmit(xbee.ADDR_BROADCAST, "Waiting for header")                                                   # --- DEBUG
         header_data = stdin.buffer.read(11) # blocks until receiving 10 bytes
         #xbee.transmit(xbee.ADDR_BROADCAST, "Received header " + str(header_data))                                  # --- DEBUG
-        header_marker1, header_marker2, data_type, data_length = unpack('<bbbQ', header_data)
+        header_marker, data_type, data_length = unpack('<bhQ', header_data)
         #xbee.transmit(xbee.ADDR_BROADCAST, "Header markers: " + str(header_marker1) + ", " + str(header_marker2))  # --- DEBUG
         #xbee.transmit(xbee.ADDR_BROADCAST, "Header data length: " + str(data_length))                              # --- DEBUG
         if(header_marker1 == 14 and header_marker2==55):
