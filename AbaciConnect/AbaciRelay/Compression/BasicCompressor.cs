@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AbaciConnect.Relay.Common
+namespace AbaciConnect.Relay.Compression
 {
-    public abstract class Compression
+    public class BasicCompressor : ICompressor
     {
-        public static byte[] Compress(IEnumerable<byte> data)
+        public byte[] Compress(IEnumerable<byte> data)
         {
             MemoryStream output = new MemoryStream();
             using (DeflateStream dstream = new DeflateStream(output, CompressionLevel.Optimal))
@@ -20,7 +20,7 @@ namespace AbaciConnect.Relay.Common
             return output.ToArray();
         }
 
-        public static byte[] Decompress(IEnumerable<byte> data)
+        public byte[] Decompress(IEnumerable<byte> data)
         {
             MemoryStream input = new MemoryStream(data.ToArray());
             MemoryStream output = new MemoryStream();

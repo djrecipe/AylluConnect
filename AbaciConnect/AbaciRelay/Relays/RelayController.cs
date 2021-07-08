@@ -8,6 +8,7 @@ using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Emission;
 using AbaciConnect.Relay.TransmissionObjects;
 using AbaciConnect.Relay.Processors;
+using AbaciConnect.Relay.Compression;
 
 namespace AbaciConnect.Relay
 {
@@ -17,16 +18,24 @@ namespace AbaciConnect.Relay
         {
             IEmissionProcessor processor = new ApiFrameEmissionProcessor();
             IRelay relay = new SerialRelay(port, processor);
-            return new RelayController(relay, processor);
+            return new RelayController(relay, processor, new TransmissionObjectFactory(new BasicCompressor()));
         }
         private readonly IEmissionProcessor emissionProcessor = null;
         private readonly TransmissionProcessor transmissionProcessor = new TransmissionProcessor();
         private readonly IRelay relay = null;
-        public RelayController(IRelay relay_in, IEmissionProcessor processor_in)
+        private readonly TransmissionObjectFactory transmissionFactory = null;
+        public RelayController(IRelay relay_in, IEmissionProcessor processor_in, TransmissionObjectFactory object_factory)
         {
+            if(relay_in == null)
+                throw new ArgumentNullException("Invalid relay for relay controller");
+            if(processor_in == null)
+                throw new ArgumentNullException("Invalid emission processor for relay controller");
+            if(object_factory == null)
+                throw new ArgumentNullException("Invalid transmission object factory for relay controller");
             this.relay = relay_in;
             this.emissionProcessor = processor_in;
             this.emissionProcessor.OnEmission += EmissionProcessor_OnEmission;
+            this.transmissionFactory = object_factory;
         }
 
         public void Clear()
@@ -69,7 +78,7 @@ namespace AbaciConnect.Relay
         {
             TransmissionObject xm = this.transmissionProcessor.WaitForTransmission(id);
             this.transmissionProcessor.RemoveTransmission(id);
-            byte[] bytes = TransmissionObjectFactory.GetData(xm);
+            byte[] bytes = this.transmissionFactory.GetData(xm);
             return bytes;
         }
         internal void SendRawBytes(ushort address, byte[] data)
@@ -98,7 +107,7 @@ namespace AbaciConnect.Relay
         }
         public void Transmit(ulong address, byte[] data)
         {
-            TransmissionObject xm = TransmissionObjectFactory.Create(data, 0);
+            TransmissionObject xm = this.transmissionFactory.Create(data, 0);
             byte[] header_bytes = this.relay.TranmissionFormatter.GetHeaderBytes(xm);
             if (header_bytes != null)
                 this.SendRawBytes(address, header_bytes);
@@ -120,7 +129,7 @@ namespace AbaciConnect.Relay
         }
         public void Transmit(ushort address, byte[] data)
         {
-            TransmissionObject xm = TransmissionObjectFactory.Create(data, 0);
+            TransmissionObject xm = this.transmissionFactory.Create(data, 0);
             byte[] header_bytes = this.relay.TranmissionFormatter.GetHeaderBytes(xm);
             if(header_bytes != null)
                 this.SendRawBytes(address, header_bytes);

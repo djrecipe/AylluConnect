@@ -42,6 +42,7 @@
                         Command="{Binding CommandConnect}"
                         BackgroundColor="{StaticResource Primary}"
                         TextColor="White" />
+                <Editor Placeholder="Enter text here" PlaceholderColor="Olive" Text="{Binding DataOut}" TextColor="Black"></Editor>
                 <Button Margin="0,10,0,0" Text="Send"
                         Command="{Binding CommandSend}"
                         BackgroundColor="{StaticResource Primary}"

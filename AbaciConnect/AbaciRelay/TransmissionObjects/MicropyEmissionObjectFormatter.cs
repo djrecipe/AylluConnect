@@ -5,9 +5,9 @@ using System.Text;
 
 namespace AbaciConnect.Relay.TransmissionObjects
 {
-    public class CustomTransmissionObjectFormatter : ITransmissionObjectFormatter
+    public class MicropyEmissionObjectFormatter : ITransmissionObjectFormatter
     {
-        private readonly CommandBytesFactory commandFactory = new CommandBytesFactory(new CustomFrameBytesFactory());
+        private readonly CommandBytesFactory commandFactory = new CommandBytesFactory(new MicropyFrameBytesFactory());
         public byte[] FormatDataBytes(ushort address, byte[] data)
         {
             return commandFactory.CreateSendDataFrame(address, data, 1);

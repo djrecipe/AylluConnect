@@ -1,4 +1,5 @@
 ﻿using AbaciConnect.Relay.Common;
+using AbaciConnect.Relay.Compression;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,16 @@ using System.Threading.Tasks;
 
 namespace AbaciConnect.Relay.TransmissionObjects
 {
-    public abstract class TransmissionObjectFactory
+    public class TransmissionObjectFactory
     {
-        public static TransmissionObject Create(byte[] data_in, uint object_id)
+        private readonly ICompressor compressor = null;
+        public TransmissionObjectFactory(ICompressor compressor)
         {
-            byte[] data_cmpr = Compression.Compress(data_in);
+            this.compressor = compressor ?? new NonCompressor();
+        }
+        public TransmissionObject Create(byte[] data_in, uint object_id)
+        {
+            byte[] data_cmpr = this.compressor.Compress(data_in);
             List<TransmissionChunk> chunks = new List<TransmissionChunk>();
             // determine max number of raw data bytes per chunk
             uint max_chunk_size = CONSTANTS.MAX_FRAME_DATA - TransmissionChunk.OVERHEAD_SIZE;
@@ -36,14 +42,14 @@ namespace AbaciConnect.Relay.TransmissionObjects
             TransmissionObject transmission_object = new TransmissionObject(object_header, chunks);
             return transmission_object;
         }
-        public static byte[] GetData(TransmissionObject obj)
+        public byte[] GetData(TransmissionObject obj)
         {
             List<byte> bytes_cmpr = new List<byte>();
             foreach(TransmissionChunk packet in obj.Chunks.OrderBy(p => p.Header.ID))
             {
                 bytes_cmpr.AddRange(packet.Data);
             }
-            byte[] bytes = Compression.Decompress(bytes_cmpr);
+            byte[] bytes = this.compressor.Decompress(bytes_cmpr);
             return bytes;
         }
     }

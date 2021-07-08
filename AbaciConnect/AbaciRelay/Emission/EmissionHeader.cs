@@ -13,6 +13,14 @@ namespace AbaciConnect.Relay.Emission
         public byte StartByte { get; private set; } = 0;
         public ushort Length { get; private set; } = 0;
         public EmissionTypes FrameType { get; private set; } = EmissionTypes.None;
+        public EmissionHeader()
+        {
+
+        }
+        internal EmissionHeader(EmissionTypes type)
+        {
+            this.FrameType = type;
+        }
         public void Unpack(List<byte> bytes)
         {
             if(bytes.Count < 4)
