@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>AbaciConnectTests</AssemblyName>
+    <AssemblyName>AylluConnect.Relay.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AbaciRelay\AbaciRelay.csproj" />
+    <ProjectReference Include="..\AylluConnectRelay\AylluConnectRelay.csproj" />
   </ItemGroup>
 
 </Project>

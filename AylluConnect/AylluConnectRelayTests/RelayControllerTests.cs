@@ -10,6 +10,7 @@ using AbaciConnect.Relay.Emission;
 using AbaciConnect.Relay.Common;
 using AbaciConnect.Relay.Processors;
 using AbaciConnect.Relay.TransmissionObjects;
+using AbaciConnect.Relay.Compression;
 
 namespace AbaciConnectTests
 {
@@ -17,6 +18,7 @@ namespace AbaciConnectTests
     [TestClass]
     public class RelayControllerTests
     {
+        private readonly TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory(new NonCompressor());
         [TestMethod]
         public void SendData()
         {
@@ -29,7 +31,7 @@ namespace AbaciConnectTests
             byte[] data_bytes = Encoding.UTF8.GetBytes(text);
             IEmissionProcessor receiver = new ApiFrameEmissionProcessor();
             IRelay relay = new SerialRelay("COM4", receiver);
-            using (RelayController ctrl_send = new RelayController(relay, receiver))
+            using (RelayController ctrl_send = new RelayController(relay, receiver, transmissionFactory))
             {
                 ulong long_address = 0x0013A20041B764AD;
                 ushort short_address = ctrl_send.Discover(long_address);
@@ -72,7 +74,7 @@ namespace AbaciConnectTests
                     // send actual data
                     try
                     {
-                        TransmissionObject xm = TransmissionObjectFactory.Create(raw_bytes, expected_object_id);
+                        TransmissionObject xm = transmissionFactory.Create(raw_bytes, expected_object_id);
                         byte[] header_bytes = xm.Header.Pack().ToArray();
                         ctrl_send.SendRawBytes(short_address, header_bytes);
                         int total_byte_count = header_bytes.Length;

@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciRelay", "AbaciRelay\AbaciRelay.csproj", "{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectRelay", "AylluConnectRelay\AylluConnectRelay.csproj", "{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciAndroidApplication", "AbaciAndroidApplication\AbaciAndroidApplication.csproj", "{9576D821-170E-4B02-AA81-011438049076}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AylluConnectAndroidApp", "AylluConnectAndroidApp\AylluConnectAndroidApp.csproj", "{9576D821-170E-4B02-AA81-011438049076}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AbaciAndroid", "AbaciAndroid\AbaciAndroid.csproj", "{6ACAD15B-1717-4744-AF25-7E316FD0A236}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbaciConnectTests", "AbaciConnectTests\AbaciConnectTests.csproj", "{6A64BF24-ABF2-4023-AB1B-65589D6967EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectAndroid", "AylluConnectAndroid\AylluConnectAndroid.csproj", "{6ACAD15B-1717-4744-AF25-7E316FD0A236}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +29,6 @@ Global
 		{6ACAD15B-1717-4744-AF25-7E316FD0A236}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ACAD15B-1717-4744-AF25-7E316FD0A236}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ACAD15B-1717-4744-AF25-7E316FD0A236}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

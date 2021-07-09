@@ -7,8 +7,8 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{6968b3a4-1835-46a3-ac5c-1ae33b475983}</TemplateGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AbaciAndroid.Droid</RootNamespace>
-    <AssemblyName>AbaciAndroid.Android</AssemblyName>
+    <RootNamespace>AylluConnect.AndroidApp</RootNamespace>
+    <AssemblyName>AylluConnect.AndroidApp</AssemblyName>
     <Deterministic>True</Deterministic>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
@@ -87,11 +87,11 @@
     <AndroidResource Include="Resources\drawable\icon_feed.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AbaciAndroid\AbaciAndroid.csproj">
+    <ProjectReference Include="..\AylluConnectAndroid\AylluConnectAndroid.csproj">
       <Project>{F1010267-620A-438F-8272-8D39BB823648}</Project>
       <Name>AbaciAndroid</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AbaciRelay\AbaciRelay.csproj">
+    <ProjectReference Include="..\AylluConnectRelay\AylluConnectRelay.csproj">
       <Project>{4ec47c36-41b6-44d6-970e-8e2b07ecc5c2}</Project>
       <Name>AbaciRelay</Name>
     </ProjectReference>

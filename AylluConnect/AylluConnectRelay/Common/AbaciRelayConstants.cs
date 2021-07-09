@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-[assembly: InternalsVisibleTo("AbaciConnectTests")]
+[assembly: InternalsVisibleTo("AylluConnect.Relay.Tests")]
 namespace AbaciConnect.Relay.Common
 {
     internal class CONSTANTS
