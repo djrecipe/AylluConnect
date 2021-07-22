@@ -18,7 +18,7 @@ namespace AbaciConnectTests
     [TestClass]
     public class RelayControllerTests
     {
-        private readonly TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory(new NonCompressor());
+        private readonly TransmissionObjectFactory transmissionFactory = new TransmissionObjectFactory(new BasicCompressor());
         [TestMethod]
         public void SendData()
         {

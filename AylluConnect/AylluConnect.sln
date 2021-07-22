@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectRelay", "AylluConnectRelay\AylluConnectRelay.csproj", "{4EC47C36-41B6-44D6-970E-8E2B07ECC5C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AylluConnectRelayTests", "AylluConnectRelayTests\AylluConnectRelayTests.csproj", "{6A64BF24-ABF2-4023-AB1B-65589D6967EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectRelayTests", "AylluConnectRelayTests\AylluConnectRelayTests.csproj", "{6A64BF24-ABF2-4023-AB1B-65589D6967EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AylluConnectUI", "..\AylluConnectUI\AylluConnectUI\AylluConnectUI.csproj", "{601CC53F-94EA-44FD-A140-F924BF347C94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A64BF24-ABF2-4023-AB1B-65589D6967EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{601CC53F-94EA-44FD-A140-F924BF347C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{601CC53F-94EA-44FD-A140-F924BF347C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{601CC53F-94EA-44FD-A140-F924BF347C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{601CC53F-94EA-44FD-A140-F924BF347C94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
