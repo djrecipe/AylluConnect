@@ -1,11 +1,13 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight.Command;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Windows.Input;
 
 namespace AylluConnectUI
 {
-    public class TransmitPageModel : INotifyPropertyChanged
+    public class SettingsPageModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string name)

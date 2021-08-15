@@ -9,6 +9,9 @@
       Title="TransmitPage">
 
     <Grid>
-        <TextBox Height="20" Width="100" Text="{Binding DestinationAddress}"></TextBox>
+        <StackPanel Orientation="Vertical">
+            <TextBox Height="20" Width="100" Text="{Binding DestinationAddress}" Margin="10"></TextBox>
+            <Button Content="Transmit" Width="100" Margin="10" Command="{Binding CommandTransmit}"></Button>
+        </StackPanel>
     </Grid>
 </Page>

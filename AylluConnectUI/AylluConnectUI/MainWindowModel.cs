@@ -30,7 +30,6 @@ namespace AylluConnectUI
         public ICommand CommandNavigateToPage { get; private set;}
         public MainWindowModel()
         {
-
             this.CommandNavigateToPage = new RelayCommand<UiPages>(this.ExecuteCommandCommandNavigateToPage, this.CanExecuteCommandNavigateToPage);
         }
         private bool CanExecuteCommandNavigateToPage(UiPages page)
