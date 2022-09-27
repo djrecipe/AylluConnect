@@ -60,7 +60,7 @@ namespace AbaciConnectTests
             {
                 raw_bytes[i] = (byte)i;
             }
-            using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
+            using (RelayController ctrl_send = RelayController.ConnectSerial("COM5"))
             {
                 using (RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
                 {
@@ -126,7 +126,7 @@ namespace AbaciConnectTests
                 //raw_bytes[i] = (byte)rnd.Next();
                 raw_bytes[i] = (byte)'x';
             }
-            using (RelayController ctrl_send = RelayController.ConnectSerial("COM4"))
+            using (RelayController ctrl_send = RelayController.ConnectSerial("COM5"))
             {
                 using (RelayController ctrl_rcv = RelayController.ConnectSerial("COM6"))
                 {

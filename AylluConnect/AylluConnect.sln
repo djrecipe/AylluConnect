@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectRelay", "AylluC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AylluConnectRelayTests", "AylluConnectRelayTests\AylluConnectRelayTests.csproj", "{6A64BF24-ABF2-4023-AB1B-65589D6967EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AylluConnectUI", "..\AylluConnectUI\AylluConnectUI\AylluConnectUI.csproj", "{601CC53F-94EA-44FD-A140-F924BF347C94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AylluConnectUI", "AylluConnectUI\AylluConnectUI.csproj", "{601CC53F-94EA-44FD-A140-F924BF347C94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
